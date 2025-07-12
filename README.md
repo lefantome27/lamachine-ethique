@@ -1,3 +1,4 @@
+♿ Adapté aux non-voyants – Interface accessible et compatible lecteurs d’écran
 # lamachine-ethique
 Système de protection IA éthique inspiré de Person of Interest
 # 🤖 La Machine Éthique - Système de Protection IA
