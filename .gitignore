@@ -1,0 +1,91 @@
+# Fichiers et dossiers à ignorer pour GitHub
+# =============================================
+
+# Exécutables et binaires
+*.exe
+*.dll
+*.so
+*.dylib
+*.app
+
+# Dossiers node_modules (trop volumineux)
+node_modules/
+**/node_modules/
+dist/node_modules/
+dist-malware-detection/node_modules/
+interface-graphique/dist/node_modules/
+interface-graphique/dist-malware-detection/node_modules/
+
+# Dossiers de build et distribution
+dist/
+dist-malware-detection/win-unpacked/
+dist-malware-detection/assets/
+build/
+out/
+interface-graphique/dist/
+interface-graphique/dist-malware-detection/win-unpacked/
+
+# Fichiers d'installation
+git-installer.exe
+*.msi
+*.deb
+*.rpm
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*.log
+*.cache
+
+# Fichiers de configuration locale
+.env
+.env.local
+.env.production
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+*.old
+
+# Fichiers de données volumineux
+*.db
+*.sqlite
+*.sqlite3
+
+# Fichiers de cache
+.cache/
+.temp/
+tmp/
+
+# Fichiers spécifiques au projet
+La Machine Éthique - Détection de Malware.exe
+git-installer.exe
+interface-graphique/La Machine Éthique - Détection de Malware.exe
+
+# Dossiers de développement
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Fichiers de logs
+logs/
+*.log
+
+# Fichiers de test
+test-results/
+coverage/
+
+# Fichiers de déploiement
+deploy/
+production/
+
+# Fichiers Electron spécifiques
+interface-graphique/dist-malware-detection/win-unpacked/
+interface-graphique/dist-malware-detection/assets/
+interface-graphique/dist-malware-detection/*.exe 
