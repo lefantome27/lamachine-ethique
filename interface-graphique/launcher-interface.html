@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Machine Éthique - Lanceur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #ff4444;
+            box-shadow: 0 0 30px rgba(255, 68, 68, 0.3);
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: url('assets/icon.ico') no-repeat center;
+            background-size: contain;
+            border-radius: 15px;
+            border: 3px solid #ff4444;
+        }
+        
+        h1 {
+            color: #ff4444;
+            margin-bottom: 20px;
+        }
+        
+        .launch-button {
+            background: linear-gradient(45deg, #ff4444, #cc0000);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .launch-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.5);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo"></div>
+        <h1>La Machine Éthique</h1>
+        <p>Détection de Malware Avancé</p>
+        
+        <button class="launch-button" onclick="launchExe()">
+            🛡️ Démarrer avec Mon Icône
+        </button>
+        
+        <button class="launch-button" onclick="openFolder()">
+            📁 Ouvrir Dossier
+        </button>
+        
+        <div class="status" id="status">Prêt à lancer...</div>
+    </div>
+
+    <script>
+        function launchExe() {
+            document.getElementById('status').textContent = 'Démarrage en cours...';
+            
+            // Utiliser Node.js pour lancer l'exécutable
+            const { exec } = require('child_process');
+            const path = require('path');
+            
+            const exePath = path.join(__dirname, 'dist-malware-detection', 'LAUNCH.bat');
+            
+            exec(`"${exePath}"`, (error, stdout, stderr) => {
+                if (error) {
+                    document.getElementById('status').textContent = 'Erreur: ' + error.message;
+                } else {
+                    document.getElementById('status').textContent = 'Application lancée !';
+                }
+            });
+        }
+        
+        function openFolder() {
+            const { exec } = require('child_process');
+            const path = require('path');
+            
+            const folderPath = path.join(__dirname, 'dist-malware-detection');
+            exec(`explorer "${folderPath}"`);
+        }
+    </script>
+</body>
+</html> 

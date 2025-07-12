@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Machine Éthique - Système de Protection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-operational { background-color: #4CAF50; }
+        .status-initializing { background-color: #FF9800; }
+        .status-error { background-color: #F44336; }
+        .status-shutdown { background-color: #9E9E9E; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .panel h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: #FFD700;
+        }
+
+        .threat-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #45a049, #4CAF50);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #1976D2, #2196F3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #F44336, #D32F2F);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(45deg, #D32F2F, #F44336);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .result-item.rejected {
+            border-left-color: #F44336;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .result-id {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .result-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-approved {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-rejected {
+            background: #F44336;
+            color: white;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #FFD700;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-weight: bold;
+        }
+
+        /* Nouvelles sections pour IPs bloquées et attaques */
+        .security-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .ip-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .ip-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #F44336;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ip-info {
+            flex: 1;
+        }
+
+        .ip-address {
+            font-weight: bold;
+            color: #FFD700;
+            font-size: 1.1em;
+        }
+
+        .ip-details {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .ip-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .attack-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .attack-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #FF9800;
+        }
+
+        .attack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .attack-type {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .attack-severity {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .severity-low { background: #4CAF50; }
+        .severity-medium { background: #FF9800; }
+        .severity-high { background: #F44336; }
+        .severity-critical { background: #9C27B0; }
+
+        .attack-details {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .attack-location {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .ethical-rules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .rule-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .rule-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .rule-name {
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .rule-description {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* Scrollbar personnalisée */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Animations pour les nouvelles entrées */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ip-item, .attack-item {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête -->
+        <div class="header">
+            <h1>🤖 La Machine Éthique</h1>
+            <p>Système de Protection Inspiré de Person of Interest</p>
+        </div>
+
+        <!-- Barre de statut -->
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot status-initializing" id="statusDot"></div>
+                <span id="statusText">Initialisation...</span>
+            </div>
+            <div>
+                <span id="uptime">Temps de fonctionnement: 0s</span>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="main-content">
+            <!-- Panneau de test de menace -->
+            <div class="panel">
+                <h2>🔍 Test de Menace</h2>
+                <form class="threat-form" id="threatForm">
+                    <div class="form-group">
+                        <label for="threatType">Type de Menace:</label>
+                        <select id="threatType" required>
+                            <option value="">Sélectionner un type</option>
+                            <option value="comportement_suspect">Comportement Suspect</option>
+                            <option value="communication_suspecte">Communication Suspecte</option>
+                            <option value="activité_suspecte">Activité Suspecte</option>
+                            <option value="menace_critique">Menace Critique</option>
+                            <option value="activité_normale">Activité Normale</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="threatLocation">Localisation:</label>
+                        <select id="threatLocation" required>
+                            <option value="">Sélectionner une localisation</option>
+                            <option value="centre_commercial">Centre Commercial</option>
+                            <option value="transport_public">Transport Public</option>
+                            <option value="infrastructure_critique">Infrastructure Critique</option>
+                            <option value="gouvernement">Gouvernement</option>
+                            <option value="école">École</option>
+                            <option value="hôpital">Hôpital</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="threatLevel">Niveau de Menace:</label>
+                        <select id="threatLevel" required>
+                            <option value="">Sélectionner un niveau</option>
+                            <option value="LOW">Faible</option>
+                            <option value="MEDIUM">Moyen</option>
+                            <option value="HIGH">Élevé</option>
+                            <option value="CRITICAL">Critique</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="threatDescription">Description (optionnel):</label>
+                        <textarea id="threatDescription" placeholder="Décrivez la menace détectée..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="behavioralPatterns"> Patterns Comportementaux
+                        </label>
+                        <label>
+                            <input type="checkbox" id="communicationPatterns"> Patterns de Communication
+                        </label>
+                        <label>
+                            <input type="checkbox" id="networkActivity"> Activité Réseau
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">🔍 Évaluer la Menace</button>
+                </form>
+            </div>
+
+            <!-- Panneau des résultats -->
+            <div class="panel">
+                <h2>📊 Résultats d'Évaluation</h2>
+                <div class="results" id="results">
+                    <p style="text-align: center; opacity: 0.7; margin-top: 50px;">
+                        Aucune évaluation effectuée
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nouvelles sections de sécurité -->
+        <div class="security-sections">
+            <!-- IPs Attaquantes Bloquées -->
+            <div class="panel">
+                <h2>🚫 IPs Attaquantes Bloquées</h2>
+                <div class="ip-list" id="blockedIPs">
+                    <p style="text-align: center; opacity: 0.7; margin-top: 50px;">
+                        Aucune IP bloquée
+                    </p>
+                </div>
+            </div>
+
+            <!-- Attaques Détectées -->
+            <div class="panel">
+                <h2>⚠️ Attaques Détectées</h2>
+                <div class="attack-list" id="detectedAttacks">
+                    <p style="text-align: center; opacity: 0.7; margin-top: 50px;">
+                        Aucune attaque détectée
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Règles éthiques -->
+        <div class="panel">
+            <h2>🛡️ Règles Éthiques Actives</h2>
+            <div class="ethical-rules" id="ethicalRules">
+                <!-- Les règles seront ajoutées dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="panel">
+            <h2>📈 Statistiques du Système</h2>
+            <div class="stats-grid" id="statsGrid">
+                <!-- Les statistiques seront ajoutées dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Pied de page -->
+        <div class="footer">
+            <p>"Protection, Éthique, et Contrôle Humain - Toujours."</p>
+            <p>Inspiré de Person of Interest - Harold Finch</p>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let machineStatus = 'INITIALIZING';
+        let startTime = Date.now();
+        let threatCount = 0;
+        let approvedCount = 0;
+        let rejectedCount = 0;
+        let blockedIPs = [];
+        let detectedAttacks = [];
+
+        // Règles éthiques
+        const ethicalRules = [
+            { icon: '🔒', name: 'Respect de la Vie Privée', description: 'Ne jamais collecter de données personnelles sans consentement' },
+            { icon: '📊', name: 'Collecte Minimale', description: 'Collecter seulement les données nécessaires' },
+            { icon: '👁️', name: 'Transparence', description: 'Toujours informer des actions du système' },
+            { icon: '👤', name: 'Contrôle Humain', description: 'Validation humaine pour actions critiques' },
+            { icon: '⚖️', name: 'Prévention des Biais', description: 'Éviter toute discrimination algorithmique' }
+        ];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            updateUptime();
+            setInterval(updateUptime, 1000);
+            
+            // Simuler des données de sécurité
+            setInterval(simulateSecurityData, 5000);
+        });
+
+        // Initialisation de l'application
+        function initializeApp() {
+            // Initialiser les règles éthiques
+            initializeEthicalRules();
+            
+            // Initialiser les statistiques
+            initializeStats();
+            
+            // Configurer le formulaire
+            setupForm();
+            
+            // Simuler le démarrage de la machine
+            setTimeout(() => {
+                machineStatus = 'OPERATIONAL';
+                updateStatus();
+            }, 2000);
+        }
+
+        // Initialiser les règles éthiques
+        function initializeEthicalRules() {
+            const rulesContainer = document.getElementById('ethicalRules');
+            rulesContainer.innerHTML = '';
+
+            ethicalRules.forEach(rule => {
+                const ruleElement = document.createElement('div');
+                ruleElement.className = 'rule-item';
+                ruleElement.innerHTML = `
+                    <div class="rule-icon">${rule.icon}</div>
+                    <div class="rule-name">${rule.name}</div>
+                    <div class="rule-description">${rule.description}</div>
+                `;
+                rulesContainer.appendChild(ruleElement);
+            });
+        }
+
+        // Initialiser les statistiques
+        function initializeStats() {
+            const statsContainer = document.getElementById('statsGrid');
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value" id="threatCount">0</div>
+                    <div class="stat-label">Menaces Évaluées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="approvedCount">0</div>
+                    <div class="stat-label">Interventions Approuvées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="rejectedCount">0</div>
+                    <div class="stat-label">Interventions Rejetées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="complianceRate">100%</div>
+                    <div class="stat-label">Conformité Éthique</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="blockedIPCount">0</div>
+                    <div class="stat-label">IPs Bloquées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="attackCount">0</div>
+                    <div class="stat-label">Attaques Détectées</div>
+                </div>
+            `;
+        }
+
+        // Configurer le formulaire
+        function setupForm() {
+            const form = document.getElementById('threatForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                assessThreat();
+            });
+        }
+
+        // Évaluer une menace
+        function assessThreat() {
+            const threatData = {
+                type: document.getElementById('threatType').value,
+                location: document.getElementById('threatLocation').value,
+                level: document.getElementById('threatLevel').value,
+                description: document.getElementById('threatDescription').value,
+                behavioralPatterns: document.getElementById('behavioralPatterns').checked,
+                communicationPatterns: document.getElementById('communicationPatterns').checked,
+                networkActivity: document.getElementById('networkActivity').checked
+            };
+
+            // Appeler l'API Electron
+            if (window.electronAPI) {
+                window.electronAPI.assessThreat(threatData).then(result => {
+                    displayResult(result);
+                    updateStats(result);
+                });
+            } else {
+                // Fallback pour le développement
+                const result = simulateAssessment(threatData);
+                displayResult(result);
+                updateStats(result);
+            }
+        }
+
+        // Simulation d'évaluation (fallback)
+        function simulateAssessment(threatData) {
+            const result = {
+                id: `THREAT_${Date.now()}`,
+                timestamp: new Date(),
+                threatData: threatData,
+                assessment: {
+                    level: threatData.level,
+                    confidence: Math.random() * 0.3 + 0.7
+                },
+                ethicalApproval: Math.random() > 0.3,
+                recommendedAction: 'MONITOR',
+                reasoning: []
+            };
+
+            // Logique d'évaluation
+            if (threatData.location.includes('école')) {
+                result.ethicalApproval = false;
+                result.reasoning.push('Intervention rejetée pour raisons éthiques');
+                result.reasoning.push('Protection des enfants prioritaire');
+            } else {
+                result.reasoning.push(`Intervention ${threatData.level.toLowerCase()} évaluée`);
+                result.reasoning.push('Validation éthique réussie');
+            }
+
+            // Recommandation d'action
+            if (result.ethicalApproval) {
+                switch (threatData.level) {
+                    case 'LOW': result.recommendedAction = 'MONITOR'; break;
+                    case 'MEDIUM': result.recommendedAction = 'INVESTIGATE'; break;
+                    case 'HIGH': result.recommendedAction = 'ALERT_HUMAN'; break;
+                    case 'CRITICAL': result.recommendedAction = 'IMMEDIATE_ACTION'; break;
+                }
+            }
+
+            return result;
+        }
+
+        // Afficher le résultat
+        function displayResult(result) {
+            const resultsContainer = document.getElementById('results');
+            
+            const resultElement = document.createElement('div');
+            resultElement.className = `result-item ${result.ethicalApproval ? '' : 'rejected'}`;
+            
+            resultElement.innerHTML = `
+                <div class="result-header">
+                    <span class="result-id">${result.id}</span>
+                    <span class="result-status ${result.ethicalApproval ? 'status-approved' : 'status-rejected'}">
+                        ${result.ethicalApproval ? 'APPROUVÉ' : 'REJETÉ'}
+                    </span>
+                </div>
+                <div class="result-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Type</div>
+                        <div class="detail-value">${result.threatData.type}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Localisation</div>
+                        <div class="detail-value">${result.threatData.location}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Niveau</div>
+                        <div class="detail-value">${result.assessment.level}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Action</div>
+                        <div class="detail-value">${result.recommendedAction}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>Raisonnement:</strong>
+                    <ul style="margin-top: 5px; margin-left: 20px;">
+                        ${result.reasoning.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            // Ajouter au début de la liste
+            resultsContainer.insertBefore(resultElement, resultsContainer.firstChild);
+            
+            // Limiter le nombre de résultats affichés
+            const results = resultsContainer.querySelectorAll('.result-item');
+            if (results.length > 10) {
+                resultsContainer.removeChild(results[results.length - 1]);
+            }
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats(result) {
+            threatCount++;
+            if (result.ethicalApproval) {
+                approvedCount++;
+            } else {
+                rejectedCount++;
+            }
+
+            document.getElementById('threatCount').textContent = threatCount;
+            document.getElementById('approvedCount').textContent = approvedCount;
+            document.getElementById('rejectedCount').textContent = rejectedCount;
+            
+            const complianceRate = threatCount > 0 ? Math.round((approvedCount / threatCount) * 100) : 100;
+            document.getElementById('complianceRate').textContent = complianceRate + '%';
+        }
+
+        // Simuler des données de sécurité
+        function simulateSecurityData() {
+            // Simuler une nouvelle IP bloquée
+            if (Math.random() > 0.7) {
+                addBlockedIP();
+            }
+
+            // Simuler une nouvelle attaque détectée
+            if (Math.random() > 0.8) {
+                addDetectedAttack();
+            }
+        }
+
+        // Ajouter une IP bloquée
+        function addBlockedIP() {
+            const ip = generateRandomIP();
+            const blockedIP = {
+                id: `IP_${Date.now()}`,
+                address: ip,
+                reason: getRandomBlockReason(),
+                timestamp: new Date(),
+                location: getRandomLocation(),
+                threatLevel: getRandomThreatLevel()
+            };
+
+            blockedIPs.unshift(blockedIP);
+            displayBlockedIPs();
+            updateIPStats();
+        }
+
+        // Ajouter une attaque détectée
+        function addDetectedAttack() {
+            const attack = {
+                id: `ATTACK_${Date.now()}`,
+                type: getRandomAttackType(),
+                severity: getRandomSeverity(),
+                location: getRandomLocation(),
+                timestamp: new Date(),
+                description: getRandomAttackDescription()
+            };
+
+            detectedAttacks.unshift(attack);
+            displayDetectedAttacks();
+            updateAttackStats();
+        }
+
+        // Afficher les IPs bloquées
+        function displayBlockedIPs() {
+            const container = document.getElementById('blockedIPs');
+            
+            if (blockedIPs.length === 0) {
+                container.innerHTML = '<p style="text-align: center; opacity: 0.7; margin-top: 50px;">Aucune IP bloquée</p>';
+                return;
+            }
+
+            container.innerHTML = blockedIPs.map(ip => `
+                <div class="ip-item">
+                    <div class="ip-info">
+                        <div class="ip-address">${ip.address}</div>
+                        <div class="ip-details">
+                            ${ip.reason} • ${ip.location} • ${ip.threatLevel}
+                        </div>
+                    </div>
+                    <div class="ip-actions">
+                        <button class="btn btn-small btn-secondary" onclick="unblockIP('${ip.id}')">Débloquer</button>
+                        <button class="btn btn-small btn-danger" onclick="permanentBlock('${ip.id}')">Bloquer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Afficher les attaques détectées
+        function displayDetectedAttacks() {
+            const container = document.getElementById('detectedAttacks');
+            
+            if (detectedAttacks.length === 0) {
+                container.innerHTML = '<p style="text-align: center; opacity: 0.7; margin-top: 50px;">Aucune attaque détectée</p>';
+                return;
+            }
+
+            container.innerHTML = detectedAttacks.map(attack => `
+                <div class="attack-item">
+                    <div class="attack-header">
+                        <span class="attack-type">${attack.type}</span>
+                        <span class="attack-severity severity-${attack.severity.toLowerCase()}">${attack.severity}</span>
+                    </div>
+                    <div class="attack-details">
+                        <div class="attack-location">📍 ${attack.location}</div>
+                        <div>${attack.description}</div>
+                        <div style="font-size: 0.8em; opacity: 0.6; margin-top: 5px;">
+                            ${attack.timestamp.toLocaleTimeString()}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Mettre à jour les statistiques des IPs
+        function updateIPStats() {
+            document.getElementById('blockedIPCount').textContent = blockedIPs.length;
+        }
+
+        // Mettre à jour les statistiques des attaques
+        function updateAttackStats() {
+            document.getElementById('attackCount').textContent = detectedAttacks.length;
+        }
+
+        // Fonctions utilitaires
+        function generateRandomIP() {
+            return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+        }
+
+        function getRandomBlockReason() {
+            const reasons = [
+                'Tentative de DDoS',
+                'Scan de ports',
+                'Tentative d\'intrusion',
+                'Trafic suspect',
+                'Violation de politique'
+            ];
+            return reasons[Math.floor(Math.random() * reasons.length)];
+        }
+
+        function getRandomLocation() {
+            const locations = [
+                'Local',
+                'Publique',
+                'Réseau interne',
+                'Internet'
+            ];
+            return locations[Math.floor(Math.random() * locations.length)];
+        }
+
+        function getRandomThreatLevel() {
+            const levels = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+            return levels[Math.floor(Math.random() * levels.length)];
+        }
+
+        function getRandomAttackType() {
+            const types = [
+                'DDoS',
+                'Brute Force',
+                'SQL Injection',
+                'XSS',
+                'Port Scan',
+                'Malware'
+            ];
+            return types[Math.floor(Math.random() * types.length)];
+        }
+
+        function getRandomSeverity() {
+            const severities = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+            return severities[Math.floor(Math.random() * severities.length)];
+        }
+
+        function getRandomAttackDescription() {
+            const descriptions = [
+                'Tentative d\'accès non autorisé détectée',
+                'Trafic anormal observé',
+                'Pattern d\'attaque identifié',
+                'Comportement suspect détecté'
+            ];
+            return descriptions[Math.floor(Math.random() * descriptions.length)];
+        }
+
+        // Fonctions d'action
+        function unblockIP(ipId) {
+            blockedIPs = blockedIPs.filter(ip => ip.id !== ipId);
+            displayBlockedIPs();
+            updateIPStats();
+        }
+
+        function permanentBlock(ipId) {
+            // Logique pour bloquer définitivement
+            console.log(`IP ${ipId} bloquée définitivement`);
+        }
+
+        // Mettre à jour le statut
+        function updateStatus() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            statusDot.className = `status-dot status-${machineStatus.toLowerCase()}`;
+            statusText.textContent = machineStatus;
+        }
+
+        // Mettre à jour le temps de fonctionnement
+        function updateUptime() {
+            const uptime = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('uptime').textContent = `Temps de fonctionnement: ${uptime}s`;
+        }
+
+        // API pour Electron
+        if (window.require) {
+            const { ipcRenderer } = require('electron');
+            
+            window.electronAPI = {
+                assessThreat: (threatData) => ipcRenderer.invoke('assess-threat', threatData),
+                getMachineStatus: () => ipcRenderer.invoke('get-machine-status'),
+                runEthicalAudit: () => ipcRenderer.invoke('run-ethical-audit')
+            };
+
+            // Écouter les mises à jour de statut
+            ipcRenderer.on('machine-status-updated', (event, status) => {
+                machineStatus = status;
+                updateStatus();
+            });
+        }
+    </script>
+</body>
+</html> 

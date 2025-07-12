@@ -1,0 +1,20 @@
+{
+  "appId": "com.lamachineethique.malwaredetection",
+  "productName": "La Machine Éthique - Détection de Malware",
+  "directories": {
+    "output": "dist-malware-detection"
+  },
+  "files": [
+    "main-malware-detection.js",
+    "malware-detection-interface.html",
+    "assets/**/*",
+    "node_modules/**/*"
+  ],
+  "win": {
+    "target": "portable",
+    "icon": "assets/icon.ico"
+  },
+  "portable": {
+    "artifactName": "La-Machine-Ethique-Malware-Detection.exe"
+  }
+} 

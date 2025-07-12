@@ -1,0 +1,114 @@
+# Code source de l'application web Flask (OpenCamGuard/app.py)
+
+from flask import Flask, render_template_string, jsonify, request
+import threading
+import time
+import yaml
+from shodan_module import get_public_cameras
+from video_stream import open_stream
+from anomaly_detector import detect_anomaly
+from alerting import play_alert
+
+app = Flask(__name__)
+
+alert_history = []
+analysis_running = False
+
+HTML_PAGE = '''
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OpenCamGuard Web</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 2em;
+            background: url('background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            text-shadow: 1px 1px 2px #000;
+        }
+        #alerts { margin-top: 2em; }
+        button { padding: 1em; font-size: 1em; }
+    </style>
+</head>
+<body>
+    <h1>OpenCamGuard - Interface Web</h1>
+    <button onclick="startAnalysis()" id="startBtn">Démarrer l'analyse</button>
+    <div id="alerts">
+        <h2>Alertes</h2>
+        <ul id="alertList"></ul>
+    </div>
+    <script>
+        function startAnalysis() {
+            fetch('/api/start', {method: 'POST'})
+                .then(r => r.json())
+                .then(data => {
+                    alert(data.message);
+                    document.getElementById('startBtn').disabled = true;
+                });
+        }
+        function fetchAlerts() {
+            fetch('/api/alerts')
+                .then(r => r.json())
+                .then(data => {
+                    let list = document.getElementById('alertList');
+                    list.innerHTML = '';
+                    data.alerts.forEach(a => {
+                        let li = document.createElement('li');
+                        li.textContent = a;
+                        list.appendChild(li);
+                    });
+                });
+        }
+        setInterval(fetchAlerts, 2000);
+        fetchAlerts();
+    </script>
+</body>
+</html>
+'''
+
+def run_analysis():
+    global analysis_running
+    analysis_running = True
+    alert_history.clear()
+    with open("config.yaml", "r") as f:
+        config = yaml.safe_load(f)
+    cams = get_public_cameras(config)
+    for cam_url in cams:
+        cap = open_stream(cam_url)
+        if not cap:
+            continue
+        while analysis_running:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            alert, msg = detect_anomaly(frame, alert_threshold=config.get('alert_threshold', 0.8))
+            if alert:
+                play_alert(msg)
+                alert_history.append(msg)
+            time.sleep(1)
+        cap.release()
+    analysis_running = False
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_PAGE)
+
+@app.route('/api/start', methods=['POST'])
+def api_start():
+    global analysis_running
+    if not analysis_running:
+        t = threading.Thread(target=run_analysis, daemon=True)
+        t.start()
+        return jsonify({'message': "Analyse démarrée."})
+    else:
+        return jsonify({'message': "Analyse déjà en cours."})
+
+@app.route('/api/alerts')
+def api_alerts():
+    return jsonify({'alerts': alert_history})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8501, debug=True) 

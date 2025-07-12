@@ -1,0 +1,88 @@
+{
+  "name": "ethical-machine-app",
+  "version": "1.0.0",
+  "description": "Application de la Machine Éthique - Système de Protection Inspiré de Person of Interest",
+  "main": "electron-app.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "tsc",
+    "electron": "electron .",
+    "dev": "electron . --dev",
+    "package": "electron-builder",
+    "dist": "npm run build && electron-builder",
+    "build-simple": "node build-simple.js",
+    "create-exe": "node create-exe.js",
+    "build-exe": "pkg launcher.js --target node16-win-x64 --output La-Machine-Ethique.exe",
+    "test": "node test-ethical-machine.js"
+  },
+  "keywords": [
+    "security",
+    "ethical",
+    "machine",
+    "person-of-interest",
+    "electron"
+  ],
+  "author": "Harold Finch",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/jest": "^29.5.3",
+    "@types/node": "^20.4.5",
+    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/parser": "^6.2.1",
+    "electron": "^25.0.0",
+    "electron-builder": "^24.13.3",
+    "eslint": "^8.45.0",
+    "jest": "^29.6.1",
+    "pkg": "^5.8.1",
+    "prettier": "^3.0.0",
+    "ts-jest": "^29.1.1",
+    "ts-node-dev": "^2.0.0"
+  },
+  "build": {
+    "appId": "com.ethicalmachine.app",
+    "productName": "La Machine Éthique",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron-app.js",
+      "index.html",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "assets/icon.ico",
+      "sign": false
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "pkg": {
+    "assets": [
+      "electron-app.js",
+      "index.html",
+      "package.json"
+    ],
+    "targets": [
+      "node16-win-x64"
+    ],
+    "outputPath": "dist-exe"
+  }
+}

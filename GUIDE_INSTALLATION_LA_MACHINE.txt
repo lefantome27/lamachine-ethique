@@ -1,0 +1,73 @@
+GUIDE D’INSTALLATION ET UTILISATION DE « LA MACHINE »
+====================================================
+
+1. INSTALLATION SUR UNE NOUVELLE MACHINE
+----------------------------------------
+
+Prérequis :
+- Python 3.8+ installé (https://www.python.org/downloads/)
+- Droits administrateur (pour modifier le firewall)
+- Copier le dossier « La Machine » sur le nouvel ordinateur
+
+Installation des dépendances :
+1. Ouvre une console (PowerShell ou CMD)
+2. Place-toi dans le dossier :
+   cd "C:\chemin\vers\La Machine\backend\python\python"
+3. Installe les dépendances :
+   pip install -r requirements.txt
+
+Lancement du programme :
+1. Toujours dans ce dossier, lance :
+   python main.py
+2. L’interface graphique s’ouvre. Clique sur « Démarrer la surveillance ».
+
+2. SIMULER UNE ATTAQUE POUR TESTER LA DÉTECTION
+-----------------------------------------------
+
+Depuis un autre ordinateur sur le même réseau :
+- Scan de ports (Nmap) :
+  nmap -T4 -A -v [IP_de_la_machine_cible]
+- Flood ICMP (ping rapide) :
+  ping -t [IP_de_la_machine_cible]
+- Flood UDP (avec hping3 sous Linux) :
+  hping3 --flood --udp -p 80 [IP_de_la_machine_cible]
+
+Depuis la même machine (test simple) :
+- Ouvre un autre terminal et lance :
+  ping 127.0.0.1 -t
+
+Résultat attendu :
+- « La Machine » doit afficher une alerte, bloquer l’IP source, ou logger l’attaque selon la configuration.
+
+3. ADAPTER LA CONFIGURATION À TON USAGE
+----------------------------------------
+
+Fichier de configuration :
+- Ouvre config.py dans backend/python/python/
+- Tu peux régler :
+  - Les seuils de détection (nombre de paquets, vitesse, etc.)
+  - Les interfaces réseau à surveiller
+  - Les actions à prendre (alerte, blocage, notification…)
+
+Exemples de personnalisation :
+- Changer le seuil de détection DDoS :
+  CONFIG['ddos']['packet_threshold'] = 1000
+- Surveiller une interface spécifique :
+  CONFIG['network']['interface'] = 'Ethernet'
+- Activer/désactiver le blocage automatique :
+  CONFIG['firewall']['auto_block'] = True
+
+4. CONSEILS SUPPLÉMENTAIRES
+---------------------------
+- Lance toujours le programme en administrateur pour que le firewall fonctionne.
+- Consulte les logs générés pour voir les détails des attaques détectées.
+- Teste différents types d’attaques pour valider la détection (scan, flood, brute force…)
+
+5. BESOIN D’AIDE SUPPLÉMENTAIRE ?
+---------------------------------
+- Si tu rencontres une erreur lors de l’installation ou du lancement, copie le message ici.
+- Si tu veux un réglage particulier (ex : whitelist, notifications par mail…), précise-le et je t’aide à l’ajouter.
+
+---
+
+Prêt à te lancer ! 

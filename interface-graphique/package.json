@@ -1,0 +1,35 @@
+{
+  "name": "la-machine-ethique-malware-detection",
+  "version": "1.0.0",
+  "description": "La Machine Éthique - Interface de Détection de Malware",
+  "main": "main-malware-detection.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "dist": "electron-builder --publish=never"
+  },
+  "build": {
+    "appId": "com.lamachineethique.malwaredetection",
+    "productName": "La Machine Éthique - Détection de Malware",
+    "directories": {
+      "output": "dist-malware-detection"
+    },
+    "files": [
+      "main-malware-detection.js",
+      "malware-detection-interface.html",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "portable",
+      "icon": "assets/icon.ico"
+    },
+    "portable": {
+      "artifactName": "La-Machine-Ethique-Malware-Detection.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "^25.0.0",
+    "electron-builder": "^24.0.0"
+  }
+}

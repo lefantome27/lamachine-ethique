@@ -1,0 +1,4 @@
+ip,nom_pc,lieu,operateur
+192.168.1.10,PC-Bureau,Paris,Orange
+192.168.1.11,PC-Salon,Lyon,SFR
+192.168.1.12,Serveur,Marseille,Bouygues 

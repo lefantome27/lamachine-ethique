@@ -1,0 +1,1863 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Machine Éthique - Système de Protection</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background:
+                linear-gradient(135deg, #0f2027 0%, #2c5364 100%),
+                url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" fill="none"/><path d="M0 20h40M20 0v40M10 10h20v20h-20z" stroke="%2333cfff" stroke-width="0.5" opacity="0.12"/></svg>') repeat;
+            color: #fff;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, #33cfff22 50%, transparent 100%);
+            pointer-events: none;
+            animation: scanmove 4s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes scanmove {
+            0% { left: -100vw; right: 100vw; }
+            100% { left: 100vw; right: -100vw; }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-operational { background-color: #4CAF50; }
+        .status-initializing { background-color: #FF9800; }
+        .status-error { background-color: #F44336; }
+        .status-shutdown { background-color: #9E9E9E; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel, .security-sections {
+            background: rgba(0,0,0,0.65);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 24px 0 rgba(0,0,0,0.25);
+            position: relative;
+            z-index: 2;
+        }
+
+        .panel h2, .security-sections h2 {
+            color: #7ecbff;
+            text-shadow: 0 2px 8px #000;
+        }
+
+        .threat-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: #0a2342;
+            color: #7ecbff;
+            border: 1px solid #7ecbff;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: bold;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .btn:hover {
+            background: #7ecbff;
+            color: #0a2342;
+        }
+
+        .results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .result-item.rejected {
+            border-left-color: #F44336;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .result-id {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .result-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-approved {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-rejected {
+            background: #F44336;
+            color: white;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: #FFD700;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            font-weight: bold;
+        }
+
+        /* Nouvelles sections pour IPs bloquées et attaques */
+        .security-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .ip-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .ip-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #F44336;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ip-info {
+            flex: 1;
+        }
+
+        .ip-address {
+            font-weight: bold;
+            color: #FFD700;
+            font-size: 1.1em;
+        }
+
+        .ip-details {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .ip-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .attack-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .attack-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #FF9800;
+        }
+
+        .attack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .attack-type {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .attack-severity {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .severity-low { background: #4CAF50; }
+        .severity-medium { background: #FF9800; }
+        .severity-high { background: #F44336; }
+        .severity-critical { background: #9C27B0; }
+
+        .attack-details {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .attack-location {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .ethical-rules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .rule-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .rule-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .rule-name {
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .rule-description {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .footer p {
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* Scrollbar personnalisée */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Animations pour les nouvelles entrées */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ip-item, .attack-item {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+    <div class="accessibility-panel" role="region" aria-label="Contrôles d'accessibilité" style="position:fixed;top:10px;right:10px;z-index:10000;background:rgba(0,0,0,0.95);border:2px solid #33cfff;border-radius:10px;padding:18px;max-width:320px;backdrop-filter:blur(10px);color:#fff;">
+        <h3 style="color:#33cfff;margin-bottom:12px;font-size:1.2em;">♿ Accessibilité</h3>
+        <div class="accessibility-controls" style="display:flex;flex-direction:column;gap:10px;">
+            <label for="modeVocal" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.98em;">
+                <input type="checkbox" id="modeVocal" onchange="toggleVocal()" style="width:18px;height:18px;accent-color:#33cfff;" />
+                Mode vocal (synthèse vocale)
+            </label>
+            <label for="highContrast" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.98em;">
+                <input type="checkbox" id="highContrast" onchange="toggleHighContrast()" style="width:18px;height:18px;accent-color:#33cfff;" />
+                Contraste élevé
+            </label>
+            <label for="largeText" style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.98em;">
+                <input type="checkbox" id="largeText" onchange="toggleLargeText()" style="width:18px;height:18px;accent-color:#33cfff;" />
+                Texte agrandi
+            </label>
+            <button onclick="readCurrentStatus()" aria-label="Lire le statut actuel du système" style="padding:8px 12px;background:#33cfff;color:#000;border:none;border-radius:5px;cursor:pointer;font-weight:bold;margin-top:10px;">🔊 Lire statut</button>
+            <button onclick="toggleKeyboardMode()" aria-label="Activer le mode navigation clavier" style="padding:8px 12px;background:#33cfff;color:#000;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">⌨️ Mode clavier</button>
+        </div>
+    </div>
+    <div class="container">
+        <!-- En-tête -->
+        <div class="header">
+            <h1>🤖 La Machine Éthique</h1>
+            <p>Système de Protection Inspiré de Person of Interest</p>
+        </div>
+
+        <!-- Barre de menu (ajout des boutons export/effacer juste en dessous) -->
+        <div style="display:flex;gap:10px;align-items:center;margin:16px 0 8px 0;">
+            <button class="btn btn-secondary" onclick="exportBlockedSummary()">Exporter IPs bloquées</button>
+            <button class="btn btn-danger" onclick="clearBlockedSummary()">Effacer</button>
+        </div>
+
+        <!-- Panel IPs bloquées tout en haut -->
+        <div class="panel" style="margin-top: 24px;">
+            <h2>🚫 IPs Attaquantes Bloquées</h2>
+            <div class="ip-list" id="blockedIPs">
+                <p style="text-align: center; opacity: 0.7; margin-top: 50px;">
+                    Aucune IP bloquée
+                </p>
+            </div>
+        </div>
+
+        <!-- Ajout du formulaire de blocage manuel d'IP juste au-dessus du panel IPs bloquées -->
+        <div class="panel" style="margin-top: 12px; margin-bottom: 0;">
+            <form id="manualBlockForm" style="display: flex; gap: 10px; align-items: center;" aria-label="Formulaire de blocage manuel d'IP">
+                <input type="text" id="manualBlockIP" placeholder="Entrer une IP à bloquer (ex: 192.168.1.20)" aria-label="Entrée : IP à bloquer" style="flex:1; padding:6px; border-radius:6px; border:1px solid #7ecbff;">
+                <input type="text" id="manualBlockPorts" placeholder="Ports (ex: 80,443)" aria-label="Entrée : Ports à bloquer" style="width:120px; padding:6px; border-radius:6px; border:1px solid #7ecbff;">
+                <button type="submit" class="btn btn-danger" aria-label="Bouton : Bloquer IP">Bloquer IP</button>
+            </form>
+        </div>
+
+        <!-- Après le header principal -->
+        <div class="panel" style="margin-top: 24px;">
+            <h2>📒 Carnet d'IPs (test rapide)</h2>
+            <form id="ipBookForm" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <input type="text" id="ipBookIP" placeholder="IP (ex: 192.168.1.20)" aria-label="Entrée : IP à ajouter au carnet" style="width:130px;">
+                <input type="text" id="ipBookName" placeholder="Nom/PC" aria-label="Entrée : Nom/PC" style="width:100px;">
+                <input type="text" id="ipBookPlace" placeholder="Lieu" aria-label="Entrée : Lieu" style="width:100px;">
+                <input type="text" id="ipBookISP" placeholder="Opérateur" aria-label="Entrée : Opérateur" style="width:100px;">
+                <button type="submit" class="btn btn-primary" aria-label="Bouton : Ajouter IP au carnet">Ajouter</button>
+            </form>
+            <div id="ipBookList" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- Barre de statut -->
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot status-initializing" id="statusDot"></div>
+                <span id="statusText">Initialisation...</span>
+            </div>
+            <div>
+                <span id="uptime">Temps de fonctionnement: 0s</span>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="main-content">
+            <!-- Panneau de test de menace -->
+            <div class="panel">
+                <h2>🔍 Test de Menace</h2>
+                <form class="threat-form" id="threatForm">
+                    <div class="form-group">
+                        <label for="threatType">Type de Menace:</label>
+                        <select id="threatType" required>
+                            <option value="">Sélectionner un type</option>
+                            <option value="comportement_suspect">Comportement Suspect</option>
+                            <option value="communication_suspecte">Communication Suspecte</option>
+                            <option value="activité_suspecte">Activité Suspecte</option>
+                            <option value="menace_critique">Menace Critique</option>
+                            <option value="activité_normale">Activité Normale</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="threatLocation">Localisation:</label>
+                        <select id="threatLocation" required>
+                            <option value="">Sélectionner une localisation</option>
+                            <option value="centre_commercial">Centre Commercial</option>
+                            <option value="transport_public">Transport Public</option>
+                            <option value="infrastructure_critique">Infrastructure Critique</option>
+                            <option value="gouvernement">Gouvernement</option>
+                            <option value="école">École</option>
+                            <option value="hôpital">Hôpital</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="threatLevel">Niveau de Menace:</label>
+                        <select id="threatLevel" required>
+                            <option value="">Sélectionner un niveau</option>
+                            <option value="LOW">Faible</option>
+                            <option value="MEDIUM">Moyen</option>
+                            <option value="HIGH">Élevé</option>
+                            <option value="CRITICAL">Critique</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="threatDescription">Description (optionnel):</label>
+                        <textarea id="threatDescription" placeholder="Décrivez la menace détectée..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="behavioralPatterns"> Patterns Comportementaux
+                        </label>
+                        <label>
+                            <input type="checkbox" id="communicationPatterns"> Patterns de Communication
+                        </label>
+                        <label>
+                            <input type="checkbox" id="networkActivity"> Activité Réseau
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">🔍 Évaluer la Menace</button>
+                </form>
+            </div>
+
+            <!-- Panneau des résultats -->
+            <div class="panel">
+                <h2>📊 Résultats d'Évaluation</h2>
+                <div class="results" id="results">
+                    <p style="text-align: center; opacity: 0.7; margin-top: 50px;">
+                        Aucune évaluation effectuée
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nouvelles sections de sécurité -->
+        <div class="security-sections">
+            <!-- IPs Attaquantes Bloquées -->
+            <div class="panel">
+                <h2>🚫 IPs Attaquantes Bloquées</h2>
+                <div class="ip-list" id="blockedIPs">
+                    <p style="text-align: center; opacity: 0.7; margin-top: 50px;">
+                        Aucune IP bloquée
+                    </p>
+                </div>
+            </div>
+
+            <!-- Attaques Détectées -->
+            <div class="panel">
+                <h2>⚠️ Attaques Détectées</h2>
+                <div class="attack-list" id="detectedAttacks">
+                    <p style="text-align: center; opacity: 0.7; margin-top: 50px;">
+                        Aucune attaque détectée
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nouvelles sections de test -->
+        <div class="security-sections">
+            <!-- Test SQL Injection -->
+            <div class="panel">
+                <h2>🛡️ Test SQL Injection</h2>
+                <form id="sqlForm" class="threat-form">
+                    <div class="form-group">
+                        <label for="sqlQuery">Requête SQL à tester:</label>
+                        <textarea id="sqlQuery" placeholder="Ex: SELECT * FROM users WHERE id = '1' OR '1'='1'" rows="3" aria-label="Zone de texte : Requête SQL à tester"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger" aria-label="Bouton : Tester la Requête">🔍 Tester la Requête</button>
+                </form>
+                <div id="sqlResult" style="margin-top: 15px; padding: 10px; border-radius: 5px; background: rgba(0,0,0,0.2);"></div>
+            </div>
+
+            <!-- Scan de Ports -->
+            <div class="panel">
+                <h2>🔎 Scan de Ports</h2>
+                <form id="scanForm" class="threat-form">
+                    <div class="form-group">
+                        <label for="scanTarget">IP à scanner:</label>
+                        <input type="text" id="scanTarget" placeholder="Ex: 192.168.1.1" value="127.0.0.1" aria-label="Entrée : IP à scanner" />
+                    </div>
+                    <button type="submit" class="btn btn-secondary" aria-label="Bouton : Scanner les Ports">🔍 Scanner les Ports</button>
+                </form>
+                <div id="scanResult" style="margin-top: 15px; max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;"></div>
+            </div>
+        </div>
+
+        <!-- Contrôle du Monitoring -->
+        <div class="panel">
+            <h2>🎛️ Contrôle du Monitoring</h2>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button id="startMonitoring" class="btn btn-primary" aria-label="Bouton : Démarrer Monitoring">▶️ Démarrer Monitoring</button>
+                <button id="stopMonitoring" class="btn btn-danger" aria-label="Bouton : Arrêter Monitoring">⏹️ Arrêter Monitoring</button>
+                <span id="monitoringStatus" style="padding: 8px 12px; border-radius: 5px; background: rgba(255,0,0,0.2);" aria-label="Statut du monitoring">Arrêté</span>
+            </div>
+        </div>
+
+        <!-- Règles éthiques -->
+        <div class="panel">
+            <h2>🛡️ Règles Éthiques Actives</h2>
+            <div class="ethical-rules" id="ethicalRules">
+                <!-- Les règles seront ajoutées dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="panel">
+            <h2>📈 Statistiques du Système</h2>
+            <div class="stats-grid" id="statsGrid">
+                <!-- Les statistiques seront ajoutées dynamiquement -->
+            </div>
+        </div>
+
+        <!-- Pied de page -->
+        <div class="footer">
+            <p>"Protection, Éthique, et Contrôle Humain - Toujours."</p>
+            <p>Inspiré de Person of Interest - Harold Finch</p>
+        </div>
+
+        <!-- Nouvelle section pour la carte -->
+        <div class="panel">
+            <h2>🌍 Carte des attaques et IPs bloquées</h2>
+            <div id="map"></div>
+        </div>
+
+        <!-- Tableau récapitulatif des IPs et attaques bloquées -->
+        <div class="panel" style="margin-top: 24px;">
+            <h2>📋 Récapitulatif des IPs et attaques bloquées</h2>
+            <table id="blockedSummary" style="width:100%;background:rgba(0,0,0,0.5);color:#fff;border-radius:8px;" aria-label="Tableau récapitulatif des IPs et attaques bloquées">
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>Ports</th>
+                        <th>Type</th>
+                        <th>Ville/Pays</th>
+                        <th>Date/Heure</th>
+                        <th>Motif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Rempli dynamiquement -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let machineStatus = 'INITIALIZING';
+        let startTime = Date.now();
+        let threatCount = 0;
+        let approvedCount = 0;
+        let rejectedCount = 0;
+        let blockedIPs = [];
+        let detectedAttacks = [];
+        let ipBook = [];
+
+        // Variables d'accessibilité
+        let vocalActif = false;
+        let highContrastActif = false;
+        let largeTextActif = false;
+        let keyboardModeActif = false;
+        let lastSpokenAttack = null;
+
+        // Règles éthiques
+        const ethicalRules = [
+            { icon: '🔒', name: 'Respect de la Vie Privée', description: 'Ne jamais collecter de données personnelles sans consentement' },
+            { icon: '📊', name: 'Collecte Minimale', description: 'Collecter seulement les données nécessaires' },
+            { icon: '👁️', name: 'Transparence', description: 'Toujours informer des actions du système' },
+            { icon: '👤', name: 'Contrôle Humain', description: 'Validation humaine pour actions critiques' },
+            { icon: '⚖️', name: 'Prévention des Biais', description: 'Éviter toute discrimination algorithmique' }
+        ];
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            updateUptime();
+            setInterval(updateUptime, 1000);
+            
+            // Initialiser les nouvelles fonctionnalités
+            initializeSecurityFeatures();
+            
+            // Écouter les événements de sécurité en temps réel
+            setupSecurityEventListeners();
+
+            // Accueil vocal et guidage
+            if (vocalActif) {
+                setTimeout(() => {
+                    speakMessage(
+                        "Bienvenue sur La Machine Éthique. Utilisez Tab pour naviguer entre les sections. Appuyez sur Entrée pour activer une fonction. Appuyez sur H pour entendre l'aide à tout moment. Appuyez sur 1 pour aller aux IPs bloquées, 2 pour les attaques détectées."
+                    );
+                }, 1500);
+            }
+            // Ajout de l'écouteur de focus à tous les boutons et liens
+            document.querySelectorAll('button, a, [tabindex], input, select, textarea, .panel, [role="region"]').forEach(el => {
+                el.addEventListener('focus', announceButtonFocus);
+            });
+            // Ajout des annonces spécifiques pour les listes déroulantes
+            document.querySelectorAll('select').forEach(sel => {
+                // sel.addEventListener('focus', announceSelectFocus);
+                // sel.addEventListener('change', announceSelectChange);
+                // Suppression des annonces vocales sur navigation clavier et souris
+                // sel.addEventListener('keydown', announceSelectKey);
+                // sel.addEventListener('keyup', announceSelectKey);
+                // Array.from(sel.options).forEach(opt => {
+                //     opt.addEventListener('mouseover', function() {
+                //         if (vocalActif) speakMessage(opt.text);
+                //     });
+                // });
+            });
+            // Suppression explicite de tout écouteur sur le select Type de Menace
+            const threatTypeSelect = document.getElementById('threatType');
+            if (threatTypeSelect) {
+                threatTypeSelect.onfocus = null;
+                threatTypeSelect.onchange = null;
+                threatTypeSelect.onkeydown = null;
+                threatTypeSelect.onkeyup = null;
+                threatTypeSelect.onmouseover = null;
+                // Suppression de tout event listener ajouté dynamiquement
+                threatTypeSelect.replaceWith(threatTypeSelect.cloneNode(true));
+            }
+        });
+
+        // Initialisation de l'application
+        function initializeApp() {
+            // Initialiser les règles éthiques
+            initializeEthicalRules();
+            
+            // Initialiser les statistiques
+            initializeStats();
+            
+            // Configurer le formulaire
+            setupForm();
+            
+            // Simuler le démarrage de la machine
+            setTimeout(() => {
+                machineStatus = 'OPERATIONAL';
+                updateStatus();
+            }, 2000);
+        }
+
+        // Initialiser les règles éthiques
+        function initializeEthicalRules() {
+            const rulesContainer = document.getElementById('ethicalRules');
+            rulesContainer.innerHTML = '';
+
+            ethicalRules.forEach(rule => {
+                const ruleElement = document.createElement('div');
+                ruleElement.className = 'rule-item';
+                ruleElement.innerHTML = `
+                    <div class="rule-icon">${rule.icon}</div>
+                    <div class="rule-name">${rule.name}</div>
+                    <div class="rule-description">${rule.description}</div>
+                `;
+                rulesContainer.appendChild(ruleElement);
+            });
+        }
+
+        // Initialiser les statistiques
+        function initializeStats() {
+            const statsContainer = document.getElementById('statsGrid');
+            statsContainer.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value" id="threatCount">0</div>
+                    <div class="stat-label">Menaces Évaluées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="approvedCount">0</div>
+                    <div class="stat-label">Interventions Approuvées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="rejectedCount">0</div>
+                    <div class="stat-label">Interventions Rejetées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="complianceRate">100%</div>
+                    <div class="stat-label">Conformité Éthique</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="blockedIPCount">0</div>
+                    <div class="stat-label">IPs Bloquées</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="attackCount">0</div>
+                    <div class="stat-label">Attaques Détectées</div>
+                </div>
+            `;
+        }
+
+        // Configurer le formulaire
+        function setupForm() {
+            const form = document.getElementById('threatForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                assessThreat();
+            });
+        }
+
+        // Évaluer une menace
+        function assessThreat() {
+            const threatData = {
+                type: document.getElementById('threatType').value,
+                location: document.getElementById('threatLocation').value,
+                level: document.getElementById('threatLevel').value,
+                description: document.getElementById('threatDescription').value,
+                behavioralPatterns: document.getElementById('behavioralPatterns').checked,
+                communicationPatterns: document.getElementById('communicationPatterns').checked,
+                networkActivity: document.getElementById('networkActivity').checked
+            };
+
+            // Appeler l'API Electron
+            if (window.electronAPI) {
+                window.electronAPI.assessThreat(threatData).then(result => {
+                    displayResult(result);
+                    updateStats(result);
+                });
+            } else {
+                // Fallback pour le développement
+                const result = simulateAssessment(threatData);
+                displayResult(result);
+                updateStats(result);
+            }
+        }
+
+        // Simulation d'évaluation (fallback)
+        function simulateAssessment(threatData) {
+            const result = {
+                id: `THREAT_${Date.now()}`,
+                timestamp: new Date(),
+                threatData: threatData,
+                assessment: {
+                    level: threatData.level,
+                    confidence: Math.random() * 0.3 + 0.7
+                },
+                ethicalApproval: Math.random() > 0.3,
+                recommendedAction: 'MONITOR',
+                reasoning: []
+            };
+
+            // Logique d'évaluation
+            if (threatData.location.includes('école')) {
+                result.ethicalApproval = false;
+                result.reasoning.push('Intervention rejetée pour raisons éthiques');
+                result.reasoning.push('Protection des enfants prioritaire');
+            } else {
+                result.reasoning.push(`Intervention ${threatData.level.toLowerCase()} évaluée`);
+                result.reasoning.push('Validation éthique réussie');
+            }
+
+            // Recommandation d'action
+            if (result.ethicalApproval) {
+                switch (threatData.level) {
+                    case 'LOW': result.recommendedAction = 'MONITOR'; break;
+                    case 'MEDIUM': result.recommendedAction = 'INVESTIGATE'; break;
+                    case 'HIGH': result.recommendedAction = 'ALERT_HUMAN'; break;
+                    case 'CRITICAL': result.recommendedAction = 'IMMEDIATE_ACTION'; break;
+                }
+            }
+
+            return result;
+        }
+
+        // Afficher le résultat
+        function displayResult(result) {
+            const resultsContainer = document.getElementById('results');
+            
+            const resultElement = document.createElement('div');
+            resultElement.className = `result-item ${result.ethicalApproval ? '' : 'rejected'}`;
+            
+            resultElement.innerHTML = `
+                <div class="result-header">
+                    <span class="result-id">${result.id}</span>
+                    <span class="result-status ${result.ethicalApproval ? 'status-approved' : 'status-rejected'}">
+                        ${result.ethicalApproval ? 'APPROUVÉ' : 'REJETÉ'}
+                    </span>
+                </div>
+                <div class="result-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Type</div>
+                        <div class="detail-value">${result.threatData.type}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Localisation</div>
+                        <div class="detail-value">${result.threatData.location}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Niveau</div>
+                        <div class="detail-value">${result.assessment.level}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Action</div>
+                        <div class="detail-value">${result.recommendedAction}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 10px;">
+                    <strong>Raisonnement:</strong>
+                    <ul style="margin-top: 5px; margin-left: 20px;">
+                        ${result.reasoning.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+
+            // Ajouter au début de la liste
+            resultsContainer.insertBefore(resultElement, resultsContainer.firstChild);
+            
+            // Limiter le nombre de résultats affichés
+            const results = resultsContainer.querySelectorAll('.result-item');
+            if (results.length > 10) {
+                resultsContainer.removeChild(results[results.length - 1]);
+            }
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats(result) {
+            threatCount++;
+            if (result.ethicalApproval) {
+                approvedCount++;
+            } else {
+                rejectedCount++;
+            }
+
+            document.getElementById('threatCount').textContent = threatCount;
+            document.getElementById('approvedCount').textContent = approvedCount;
+            document.getElementById('rejectedCount').textContent = rejectedCount;
+            
+            const complianceRate = threatCount > 0 ? Math.round((approvedCount / threatCount) * 100) : 100;
+            document.getElementById('complianceRate').textContent = complianceRate + '%';
+        }
+
+        // Simuler des données de sécurité
+        function simulateSecurityData() {
+            // Simuler une nouvelle IP bloquée
+            if (Math.random() > 0.7) {
+                addBlockedIP();
+            }
+
+            // Simuler une nouvelle attaque détectée
+            if (Math.random() > 0.8) {
+                addDetectedAttack();
+            }
+        }
+
+        // Ajouter une IP bloquée
+        function addBlockedIP() {
+            const ip = generateRandomIP();
+            const blockedIP = {
+                id: `IP_${Date.now()}`,
+                address: ip,
+                reason: getRandomBlockReason(),
+                timestamp: new Date(),
+                location: getRandomLocation(),
+                threatLevel: getRandomThreatLevel()
+            };
+
+            blockedIPs.unshift(blockedIP);
+            displayBlockedIPs();
+            updateIPStats();
+        }
+
+        // Ajouter une attaque détectée
+        function addDetectedAttack() {
+            const attack = {
+                id: `ATTACK_${Date.now()}`,
+                type: getRandomAttackType(),
+                severity: getRandomSeverity(),
+                location: getRandomLocation(),
+                timestamp: new Date(),
+                description: getRandomAttackDescription()
+            };
+
+            detectedAttacks.unshift(attack);
+            displayDetectedAttacks();
+            updateAttackStats();
+        }
+
+        // Afficher les IPs bloquées
+        async function displayBlockedIPs() {
+            const listDiv = document.getElementById('blockedIPs');
+            if (!listDiv) return;
+            listDiv.innerHTML = '';
+            let alreadyShown = new Set();
+            for (const ip of blockedIPs) {
+                const loc = await getIPLocation(ip.address);
+                let city = loc && loc.city ? loc.city : '';
+                let country = loc && loc.country ? loc.country : '';
+                let locText = city && country ? `${city}, ${country}` : (city || country);
+                let dateText = ip.date ? new Date(ip.date).toLocaleString('fr-FR') : '';
+                let description = ip.description || ip.type || '';
+                let spelledIp = spellIp(ip.address);
+                let ariaLabel = `${spelledIp}, Blocage`;
+                if (locText) ariaLabel += `, ${locText}`;
+                if (dateText) ariaLabel += `, ${dateText}`;
+                if (description) ariaLabel += `, ${description}`;
+                const el = document.createElement('div');
+                el.setAttribute('tabindex', '0');
+                el.setAttribute('aria-label', ariaLabel);
+                el.innerHTML = `<b>${ip.address}</b> | <span style='font-size:0.95em;opacity:0.8;'>🌍 ${locText}</span> <span style='color:#ff4444;'>${ip.type ? '['+ip.type+']' : ''}</span> <span style='font-size:0.9em;opacity:0.7;'>${ip.date ? '🕒 ' + dateText : ''}</span> <span style='font-size:0.9em;opacity:0.7;'>${description ? description : ''}</span>`;
+                listDiv.appendChild(el);
+                if (loc) addMapMarker(ip.address, `IP bloquée: ${ip.address}`);
+                alreadyShown.add(ip.address);
+            }
+            if (listDiv.innerHTML.trim() === '') {
+                listDiv.innerHTML = '<p style="text-align:center;opacity:0.7;margin-top:50px;">Aucune IP bloquée</p>';
+            }
+        }
+
+        // Afficher les attaques détectées
+        async function displayDetectedAttacks() {
+            const listDiv = document.getElementById('detectedAttacks');
+            if (!listDiv) return;
+            listDiv.innerHTML = '';
+            if (detectedAttacks.length === 0) {
+                listDiv.innerHTML = '<p style="text-align:center;opacity:0.7;margin-top:50px;">Aucune attaque détectée</p>';
+                return;
+            }
+            for (const attack of detectedAttacks) {
+                let locText = '';
+                let portsText = attack.ports && attack.ports.length ? `:${attack.ports.join(',')}` : (attack.port ? `:${attack.port}` : '');
+                let dateText = attack.timestamp ? new Date(attack.timestamp).toLocaleString('fr-FR') : '';
+                if (attack.address) {
+                    const loc = await getIPLocation(attack.address);
+                    locText = loc ? `🌍 ${loc.city ? loc.city+', ' : ''}${loc.country}` : '';
+                    if (loc) addMapMarker(attack.address, `Attaque: ${attack.type}${portsText}`,'orange');
+                }
+                // Construction du label détaillé
+                let ariaLabel = `Attaque détectée : IP ${attack.address || 'inconnue'}${portsText}`;
+                if (attack.type) ariaLabel += `, type ${attack.type}`;
+                if (dateText) ariaLabel += `, le ${dateText}`;
+                if (locText) ariaLabel += `, lieu ${locText.replace('🌍 ','')}`;
+                if (attack.description) ariaLabel += `, description : ${attack.description}`;
+                const el = document.createElement('div');
+                el.setAttribute('tabindex', '0');
+                el.setAttribute('aria-label', ariaLabel);
+                el.className = 'attack-item';
+                el.innerHTML = `<b>${attack.address ? attack.address + portsText : ''}</b> <span style='font-size:0.95em;opacity:0.8;'>${locText}</span> <span style='color:#7ecbff;'>${attack.type}</span>`;
+                listDiv.appendChild(el);
+            }
+        }
+
+        // Mettre à jour les statistiques des IPs
+        function updateIPStats() {
+            document.getElementById('blockedIPCount').textContent = blockedIPs.length;
+        }
+
+        // Mettre à jour les statistiques des attaques
+        function updateAttackStats() {
+            document.getElementById('attackCount').textContent = detectedAttacks.length;
+        }
+
+        // Fonctions utilitaires
+        function generateRandomIP() {
+            return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+        }
+
+        function getRandomBlockReason() {
+            const reasons = [
+                'Tentative de DDoS',
+                'Scan de ports',
+                'Tentative d\'intrusion',
+                'Trafic suspect',
+                'Violation de politique'
+            ];
+            return reasons[Math.floor(Math.random() * reasons.length)];
+        }
+
+        function getRandomLocation() {
+            const locations = [
+                'Local',
+                'Publique',
+                'Réseau interne',
+                'Internet'
+            ];
+            return locations[Math.floor(Math.random() * locations.length)];
+        }
+
+        function getRandomThreatLevel() {
+            const levels = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+            return levels[Math.floor(Math.random() * levels.length)];
+        }
+
+        function getRandomAttackType() {
+            const types = [
+                'DDoS',
+                'Brute Force',
+                'SQL Injection',
+                'XSS',
+                'Port Scan',
+                'Malware'
+            ];
+            return types[Math.floor(Math.random() * types.length)];
+        }
+
+        function getRandomSeverity() {
+            const severities = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+            return severities[Math.floor(Math.random() * severities.length)];
+        }
+
+        function getRandomAttackDescription() {
+            const descriptions = [
+                'Tentative d\'accès non autorisé détectée',
+                'Trafic anormal observé',
+                'Pattern d\'attaque identifié',
+                'Comportement suspect détecté'
+            ];
+            return descriptions[Math.floor(Math.random() * descriptions.length)];
+        }
+
+        // Fonctions d'action
+        function unblockIP(ipId) {
+            blockedIPs = blockedIPs.filter(ip => ip.id !== ipId);
+            displayBlockedIPs();
+            updateIPStats();
+        }
+
+        function permanentBlock(ipId) {
+            // Logique pour bloquer définitivement
+            console.log(`IP ${ipId} bloquée définitivement`);
+        }
+
+        // Mettre à jour le statut
+        function updateStatus() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            statusDot.className = `status-dot status-${machineStatus.toLowerCase()}`;
+            statusText.textContent = machineStatus;
+        }
+
+        // Mettre à jour le temps de fonctionnement
+        function updateUptime() {
+            const uptime = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('uptime').textContent = `Temps de fonctionnement: ${uptime}s`;
+        }
+
+        // API pour Electron
+        if (window.require) {
+            const { ipcRenderer } = require('electron');
+            
+            window.electronAPI = {
+                assessThreat: (threatData) => ipcRenderer.invoke('assess-threat', threatData),
+                getMachineStatus: () => ipcRenderer.invoke('get-machine-status'),
+                runEthicalAudit: () => ipcRenderer.invoke('run-ethical-audit')
+            };
+
+            // Écouter les mises à jour de statut
+            ipcRenderer.on('machine-status-updated', (event, status) => {
+                machineStatus = status;
+                updateStatus();
+            });
+        }
+
+        // Initialiser les fonctionnalités de sécurité
+        function initializeSecurityFeatures() {
+            // Formulaire SQL Injection
+            const sqlForm = document.getElementById('sqlForm');
+            if (sqlForm) {
+                sqlForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const query = document.getElementById('sqlQuery').value;
+                    if (query.trim()) {
+                        const result = await window.electronAPI.testSQLQuery(query);
+                        displaySQLResult(result);
+                    }
+                });
+            }
+
+            // Formulaire Scan de Ports
+            const scanForm = document.getElementById('scanForm');
+            if (scanForm) {
+                scanForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const target = document.getElementById('scanTarget').value;
+                    if (target.trim()) {
+                        await performPortScan(target);
+                    }
+                });
+            }
+
+            // Contrôles de monitoring
+            const startBtn = document.getElementById('startMonitoring');
+            const stopBtn = document.getElementById('stopMonitoring');
+            
+            if (startBtn) {
+                startBtn.addEventListener('click', async function() {
+                    await window.electronAPI.startMonitoring();
+                });
+            }
+            
+            if (stopBtn) {
+                stopBtn.addEventListener('click', async function() {
+                    await window.electronAPI.stopMonitoring();
+                });
+            }
+
+            // Charger les données initiales
+            loadInitialSecurityData();
+        }
+
+        // Configurer les écouteurs d'événements de sécurité
+        function setupSecurityEventListeners() {
+            if (window.electronAPI) {
+                // IP bloquée
+                window.electronAPI.onIPBlocked((event, blockedIP) => {
+                    addBlockedIP(blockedIP);
+                    showAlert(`🚫 IP bloquée: ${blockedIP.address}`, 'danger');
+                });
+
+                // IP débloquée
+                window.electronAPI.onIPUnblocked((event, ip) => {
+                    removeBlockedIP(ip);
+                    showAlert(`✅ IP débloquée: ${ip}`, 'success');
+                });
+
+                // Attaque détectée
+                window.electronAPI.onAttackDetected((event, attack) => {
+                    addDetectedAttack(attack);
+                    showAlert(`⚠️ Attaque détectée: ${attack.type}`, 'warning');
+                });
+
+                // Monitoring démarré
+                window.electronAPI.onMonitoringStarted(() => {
+                    updateMonitoringStatus(true);
+                    showAlert('🟢 Monitoring de sécurité démarré', 'success');
+                });
+
+                // Monitoring arrêté
+                window.electronAPI.onMonitoringStopped(() => {
+                    updateMonitoringStatus(false);
+                    showAlert('🔴 Monitoring de sécurité arrêté', 'info');
+                });
+            }
+        }
+
+        // Charger les données de sécurité initiales
+        async function loadInitialSecurityData() {
+            if (window.electronAPI) {
+                try {
+                    // Charger les IPs bloquées
+                    const blockedIPs = await window.electronAPI.getBlockedIPs();
+                    blockedIPs.forEach(ip => addBlockedIP(ip));
+
+                    // Charger les attaques détectées
+                    const attacks = await window.electronAPI.getDetectedAttacks();
+                    attacks.forEach(attack => addDetectedAttack(attack));
+
+                    // Statut du monitoring
+                    const monitoringStatus = await window.electronAPI.getMonitoringStatus();
+                    updateMonitoringStatus(monitoringStatus.isMonitoring);
+                } catch (error) {
+                    console.error('Erreur chargement données:', error);
+                }
+            }
+        }
+
+        // Afficher le résultat du test SQL
+        function displaySQLResult(result) {
+            const resultDiv = document.getElementById('sqlResult');
+            if (resultDiv) {
+                resultDiv.innerHTML = `
+                    <div style="color: ${result.detected ? '#ff4444' : '#44ff44'}; font-weight: bold;">
+                        ${result.message}
+                    </div>
+                    <div style="margin-top: 5px; font-size: 0.9em; opacity: 0.8;">
+                        Requête testée: <code>${result.query}</code>
+                    </div>
+                `;
+            }
+        }
+
+        // Effectuer un scan de ports
+        async function performPortScan(target) {
+            const resultDiv = document.getElementById('scanResult');
+            if (resultDiv) {
+                resultDiv.innerHTML = '<div style="color: #ffaa00;">🔍 Scan en cours...</div>';
+                
+                try {
+                    const result = await window.electronAPI.scanPorts(target);
+                    
+                    if (result.success) {
+                        displayScanResults(result.results);
+                    } else {
+                        resultDiv.innerHTML = `<div style="color: #ff4444;">❌ Erreur: ${result.error}</div>`;
+                    }
+                } catch (error) {
+                    resultDiv.innerHTML = `<div style="color: #ff4444;">❌ Erreur: ${error.message}</div>`;
+                }
+            }
+        }
+
+        // Afficher les résultats du scan
+        function displayScanResults(results) {
+            const resultDiv = document.getElementById('scanResult');
+            if (resultDiv && results.length > 0) {
+                let html = '<div style="color: #44ff44;">✅ Scan terminé</div><br>';
+                
+                results.forEach(host => {
+                    html += `<div style="margin-bottom: 10px;"><strong>Host: ${host.host}</strong> (${host.state})</div>`;
+                    
+                    if (host.ports && host.ports.length > 0) {
+                        html += '<div style="margin-left: 15px;">';
+                        host.ports.forEach(port => {
+                            const color = port.state === 'open' ? '#ff4444' : '#44ff44';
+                            html += `<div style="color: ${color};">Port ${port.port}: ${port.state} (${port.service})</div>`;
+                        });
+                        html += '</div>';
+                    }
+                });
+                
+                resultDiv.innerHTML = html;
+            } else {
+                resultDiv.innerHTML = '<div style="color: #ffaa00;">Aucun résultat trouvé</div>';
+            }
+        }
+
+        // Mettre à jour le statut du monitoring
+        function updateMonitoringStatus(isMonitoring) {
+            const statusSpan = document.getElementById('monitoringStatus');
+            if (statusSpan) {
+                if (isMonitoring) {
+                    statusSpan.textContent = '🟢 Actif';
+                    statusSpan.style.background = 'rgba(0,255,0,0.2)';
+                } else {
+                    statusSpan.textContent = '🔴 Arrêté';
+                    statusSpan.style.background = 'rgba(255,0,0,0.2)';
+                }
+            }
+        }
+
+        // Ajouter une IP bloquée
+        function addBlockedIP(blockedIP) {
+            blockedIPs.unshift(blockedIP);
+            displayBlockedIPs();
+            updateIPStats();
+        }
+
+        // Supprimer une IP bloquée
+        function removeBlockedIP(ip) {
+            blockedIPs = blockedIPs.filter(bip => bip.address !== ip);
+            displayBlockedIPs();
+            updateIPStats();
+        }
+
+        // Ajouter une attaque détectée
+        function addDetectedAttack(attack) {
+            detectedAttacks.unshift(attack);
+            displayDetectedAttacks();
+            updateAttackStats();
+        }
+
+        // Afficher une alerte
+        function showAlert(message, type) {
+            // Créer une alerte temporaire
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+                background: ${type === 'danger' ? '#ff4444' : type === 'success' ? '#44ff44' : type === 'warning' ? '#ffaa00' : '#4444ff'};
+            `;
+            alertDiv.textContent = message;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Supprimer après 3 secondes
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 3000);
+        }
+
+        // --- Localisation IP et affichage sur la carte ---
+        let map, markers = [];
+
+        function initMap() {
+            map = L.map('map').setView([20, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 18,
+            }).addTo(map);
+        }
+
+        async function getIPLocation(ip) {
+            try {
+                const res = await fetch(`http://ip-api.com/json/${ip}`);
+                if (!res.ok) return null;
+                const data = await res.json();
+                if (data.status === 'success') {
+                    return {
+                        city: data.city,
+                        country: data.country,
+                        lat: data.lat,
+                        lon: data.lon
+                    };
+                }
+                return null;
+            } catch {
+                return null;
+            }
+        }
+
+        // Ajoute un marqueur sur la carte
+        function addMapMarker(ip, label, color = 'red') {
+            getIPLocation(ip).then(loc => {
+                if (loc && map) {
+                    const marker = L.circleMarker([loc.lat, loc.lon], {
+                        color: color,
+                        radius: 8,
+                        fillOpacity: 0.7
+                    }).addTo(map);
+                    marker.bindPopup(`<b>${label}</b><br>${loc.city}, ${loc.country}`);
+                    markers.push(marker);
+                }
+            });
+        }
+
+        // Appelle cette fonction après le chargement de la page
+        setTimeout(initMap, 1000);
+
+        // Ajout du blocage manuel d'IP
+        const manualBlockForm = document.getElementById('manualBlockForm');
+        if (manualBlockForm) {
+            manualBlockForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const ip = document.getElementById('manualBlockIP').value.trim();
+                const portsStr = document.getElementById('manualBlockPorts').value.trim();
+                if (!ip) return;
+                let ports = [];
+                if (portsStr) {
+                    ports = portsStr.split(',').map(p => parseInt(p)).filter(p => !isNaN(p));
+                }
+                // Ajoute l'IP bloquée localement (pour test)
+                blockedIPs.unshift({
+                    id: `IP_${Date.now()}`,
+                    address: ip,
+                    reason: 'Blocage manuel',
+                    timestamp: new Date(),
+                    location: 'Network',
+                    threatLevel: 'HIGH',
+                    ports: ports
+                });
+                displayBlockedIPs();
+                showAlert(`IP ${ip} bloquée manuellement`, 'danger');
+                manualBlockForm.reset();
+            });
+        }
+
+        function renderIPBook() {
+            const listDiv = document.getElementById('ipBookList');
+            if (!listDiv) return;
+            if (ipBook.length === 0) {
+                listDiv.innerHTML = "<i>Aucune IP enregistrée</i>";
+                return;
+            }
+            listDiv.innerHTML = ipBook.map((entry, idx) => `
+                <div style="margin-bottom:6px;">
+                    <b>${entry.ip}</b> (${entry.name || "?"}, ${entry.place || "?"}, ${entry.isp || "?"})
+                    <button class="btn btn-secondary" onclick="scanIPBook(${idx})">Scan</button>
+                    <button class="btn btn-danger" onclick="blockIPBook(${idx})">Bloquer</button>
+                    <button class="btn btn-info" onclick="geoIPBook(${idx})">Géo</button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('ipBookForm').onsubmit = function(e) {
+            e.preventDefault();
+            const ip = document.getElementById('ipBookIP').value.trim();
+            const name = document.getElementById('ipBookName').value.trim();
+            const place = document.getElementById('ipBookPlace').value.trim();
+            const isp = document.getElementById('ipBookISP').value.trim();
+            if (!ip) return;
+            ipBook.push({ ip, name, place, isp });
+            renderIPBook();
+            this.reset();
+        };
+
+        window.scanIPBook = async function(idx) {
+            const entry = ipBook[idx];
+            if (entry) {
+                await window.electronAPI.scanPorts(entry.ip);
+                showAlert(`Scan lancé sur ${entry.ip}`, 'info');
+            }
+        };
+        window.blockIPBook = function(idx) {
+            const entry = ipBook[idx];
+            if (entry) {
+                blockedIPs.unshift({
+                    id: `IP_${Date.now()}`,
+                    address: entry.ip,
+                    reason: 'Blocage carnet',
+                    timestamp: new Date(),
+                    location: 'Network',
+                    threatLevel: 'HIGH',
+                    ports: []
+                });
+                displayBlockedIPs();
+                showAlert(`IP ${entry.ip} bloquée depuis le carnet`, 'danger');
+            }
+        };
+        window.geoIPBook = async function(idx) {
+            const entry = ipBook[idx];
+            if (entry) {
+                const loc = await getIPLocation(entry.ip);
+                showAlert(loc ? `🌍 ${loc.city}, ${loc.country}` : 'Localisation inconnue', 'info');
+            }
+        };
+
+        renderIPBook();
+
+        async function renderBlockedSummary() {
+            const tbody = document.querySelector('#blockedSummary tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            // 1. IPs bloquées
+            for (const ip of blockedIPs) {
+                const loc = await getIPLocation(ip.address);
+                const locText = loc ? `${loc.city ? loc.city+', ' : ''}${loc.country}` : '';
+                const ports = ip.ports && ip.ports.length ? ip.ports.join(',') : '';
+                const date = ip.timestamp ? new Date(ip.timestamp).toLocaleString() : '';
+                tbody.innerHTML += `<tr>
+                    <td>${ip.address}</td>
+                    <td>${ports}</td>
+                    <td>Blocage</td>
+                    <td>${locText}</td>
+                    <td>${date}</td>
+                    <td>${ip.reason || ''}</td>
+                </tr>`;
+            }
+            // 2. Attaques DDoS non déjà listées
+            let already = new Set(blockedIPs.map(ip => ip.address));
+            for (const attack of detectedAttacks) {
+                if (attack.type === 'DDoS' && attack.address && !already.has(attack.address)) {
+                    const loc = await getIPLocation(attack.address);
+                    const locText = loc ? `${loc.city ? loc.city+', ' : ''}${loc.country}` : '';
+                    const ports = attack.ports && attack.ports.length ? attack.ports.join(',') : (attack.port ? attack.port : '');
+                    const date = attack.timestamp ? new Date(attack.timestamp).toLocaleString() : '';
+                    tbody.innerHTML += `<tr>
+                        <td>${attack.address}</td>
+                        <td>${ports}</td>
+                        <td>DDoS</td>
+                        <td>${locText}</td>
+                        <td>${date}</td>
+                        <td>${attack.description || ''}</td>
+                    </tr>`;
+                }
+            }
+        }
+        // Appeler ce rendu après chaque ajout/bloquage
+        const oldDisplayBlockedIPs = displayBlockedIPs;
+        displayBlockedIPs = async function() {
+            await oldDisplayBlockedIPs.apply(this, arguments);
+            await renderBlockedSummary();
+        };
+        // Premier rendu au chargement
+        renderBlockedSummary();
+
+        function exportBlockedSummary() {
+            let lines = ["IP\tPorts\tType\tVille/Pays\tDate/Heure\tMotif"];
+            for (const ip of blockedIPs) {
+                const loc = ip._locText || '';
+                const ports = ip.ports && ip.ports.length ? ip.ports.join(',') : '';
+                const date = ip.timestamp ? new Date(ip.timestamp).toLocaleString() : '';
+                lines.push(`${ip.address}\t${ports}\tBlocage\t${loc}\t${date}\t${ip.reason || ''}`);
+            }
+            let already = new Set(blockedIPs.map(ip => ip.address));
+            for (const attack of detectedAttacks) {
+                if (attack.type === 'DDoS' && attack.address && !already.has(attack.address)) {
+                    const loc = attack._locText || '';
+                    const ports = attack.ports && attack.ports.length ? attack.ports.join(',') : (attack.port ? attack.port : '');
+                    const date = attack.timestamp ? new Date(attack.timestamp).toLocaleString() : '';
+                    lines.push(`${attack.address}\t${ports}\tDDoS\t${loc}\t${date}\t${attack.description || ''}`);
+                }
+            }
+            const blob = new Blob([lines.join('\n')], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ips_bloquees.txt';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+        function clearBlockedSummary() {
+            blockedIPs = [];
+            detectedAttacks = [];
+            displayBlockedIPs();
+            renderBlockedSummary();
+            showAlert('Liste effacée', 'danger');
+        }
+
+        // Détection Electron vs Web
+        function isElectron() {
+            return typeof window !== 'undefined' && window.process && window.process.type === 'renderer';
+        }
+
+        // Afficher un bandeau si mode web
+        if (!isElectron()) {
+            document.body.insertAdjacentHTML('afterbegin', '<div style="background:#33cfff;color:#000;padding:12px;text-align:center;font-weight:bold;">Mode démo web : toutes les fonctionnalités sont simulées (scan, blocage, etc.)</div>');
+        }
+
+        // Simulation scan de ports en mode web
+        async function webSimulateScanPorts(target) {
+            // Simule un scan avec ports 80 et 443 ouverts
+            return [
+                {
+                    host: target,
+                    state: 'up',
+                    ports: [
+                        { port: 80, state: 'open', service: 'http', version: '' },
+                        { port: 443, state: 'open', service: 'https', version: '' }
+                    ],
+                    scan_time: new Date().toISOString()
+                }
+            ];
+        }
+
+        // Surcharge des actions si hors Electron
+        if (!isElectron()) {
+            // Scan de ports
+            window.electronAPI = window.electronAPI || {};
+            window.electronAPI.scanPorts = async (target) => {
+                const results = await webSimulateScanPorts(target);
+                // Ajoute l'IP bloquée simulée
+                blockedIPs.unshift({
+                    id: `IP_${Date.now()}`,
+                    address: target,
+                    reason: 'Blocage (scan simulé)',
+                    timestamp: new Date(),
+                    location: 'Network',
+                    threatLevel: 'HIGH',
+                    ports: [80, 443]
+                });
+                displayBlockedIPs();
+                renderBlockedSummary();
+                return { success: true, results };
+            };
+            // Blocage IP (déjà géré localement)
+            // Test SQLi (simulé)
+            window.electronAPI.testSQLQuery = async (query) => {
+                const detected = /('|--|or|select|union|drop|sleep|benchmark)/i.test(query);
+                return {
+                    detected,
+                    message: detected ? '⚠️ Injection SQL détectée ! (simulation)' : '✅ Requête sécurisée (simulation)',
+                    query
+                };
+            };
+            // Monitoring (simulé)
+            window.electronAPI.startMonitoring = async () => { showAlert('Monitoring simulé (web)', 'info'); return { success: true }; };
+            window.electronAPI.stopMonitoring = async () => { showAlert('Monitoring arrêté (web)', 'info'); return { success: true }; };
+            window.electronAPI.getMonitoringStatus = async () => { return { isMonitoring: false }; };
+        }
+
+        // Variables d'accessibilité
+        function toggleVocal() {
+            vocalActif = document.getElementById('modeVocal').checked;
+            if (vocalActif) {
+                speakMessage('Mode vocal activé. Toutes les actions seront annoncées vocalement.');
+            } else {
+                speakMessage('Mode vocal désactivé.');
+            }
+        }
+        function toggleHighContrast() {
+            highContrastActif = document.getElementById('highContrast').checked;
+            if (highContrastActif) {
+                document.body.classList.add('high-contrast');
+                speakMessage('Contraste élevé activé');
+            } else {
+                document.body.classList.remove('high-contrast');
+                speakMessage('Contraste élevé désactivé');
+            }
+        }
+        function toggleLargeText() {
+            largeTextActif = document.getElementById('largeText').checked;
+            if (largeTextActif) {
+                document.body.style.fontSize = '1.2em';
+                speakMessage('Texte agrandi activé');
+            } else {
+                document.body.style.fontSize = '1em';
+                speakMessage('Texte agrandi désactivé');
+            }
+        }
+        function toggleKeyboardMode() {
+            keyboardModeActif = !keyboardModeActif;
+            if (keyboardModeActif) {
+                speakMessage('Mode navigation clavier activé. Utilisez Tab pour naviguer et Entrée pour activer.');
+            } else {
+                speakMessage('Mode navigation clavier désactivé');
+            }
+        }
+        function readCurrentStatus() {
+            let status = '';
+            // Statut général
+            status += `Statut système: ${document.getElementById('attackCount')?.textContent || 0} attaques détectées, ${document.getElementById('blockedIPCount')?.textContent || 0} IPs bloquées.`;
+            // Liste détaillée des IPs bloquées
+            const listDiv = document.getElementById('blockedIPs');
+            if (listDiv) {
+                const ipDivs = listDiv.querySelectorAll('div[aria-label]');
+                if (ipDivs.length > 0) {
+                    status += ' Détail des IPs bloquées : ';
+                    ipDivs.forEach(div => {
+                        status += div.getAttribute('aria-label') + '. ';
+                    });
+                }
+            }
+            speakMessage(status);
+        }
+        function speakMessage(message) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(message);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+        // Annonce du focus sur chaque bouton/lien
+        function announceButtonFocus(event) {
+            // Désactivation TOTALE de la voix pour tous les <select> (menus déroulants)
+            if (event.target && event.target.tagName === 'SELECT') return;
+            if (!vocalActif) return;
+            const el = event.target;
+            let label = el.getAttribute('aria-label') || el.placeholder || el.innerText || el.value || '';
+            if (el.tagName === 'INPUT') {
+                speakMessage(label || 'Entrée à remplir');
+            } else if (el.tagName === 'TEXTAREA') {
+                speakMessage(label || 'Zone de texte à remplir');
+            } else if (el.tagName === 'BUTTON') {
+                speakMessage(label || 'Bouton');
+            } else {
+                speakMessage(label);
+            }
+        }
+        // Ajout d'un écouteur keydown sur chaque <select> pour lire l'option survolée
+        function announceSelectKey(event) {
+            if (!vocalActif) return;
+            const el = event.target;
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                let selectedOption = el.options[el.selectedIndex]?.text || '';
+                speakMessage(selectedOption);
+            }
+        }
+        // Ajout d'un écouteur keyup sur chaque <select> pour lire l'option survolée à la souris (mouseover sur option) et à la navigation clavier (flèches), pour tous les menus déroulants
+        function announceSelectKeyup(event) {
+            if (!vocalActif) return;
+            const el = event.target;
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                let selectedOption = el.options[el.selectedIndex]?.text || '';
+                speakMessage(selectedOption);
+            }
+        }
+        document.addEventListener('keydown', function(event) {
+            if (vocalActif && event.key.toLowerCase() === 'h') {
+                speakMessage(
+                    "Aide : Utilisez Tab pour naviguer, Entrée pour activer, 1 pour IPs bloquées, 2 pour attaques détectées."
+                );
+            }
+            // Raccourcis pour navigation rapide
+            if (vocalActif) {
+                switch(event.key) {
+                    case '1':
+                        document.getElementById('blockedIPs')?.focus();
+                        speakMessage('Section IPs bloquées');
+                        break;
+                    case '2':
+                        document.getElementById('detectedAttacks')?.focus();
+                        speakMessage('Section Attaques détectées');
+                        break;
+                }
+            }
+        });
+        // Logique anti-répétition pour les alertes DDoS
+        function announceNewAttack(attack) {
+            if (!vocalActif) return;
+            let msg = '';
+            if (attack.type === 'DDoS') {
+                msg = `Nouvelle attaque DDoS détectée depuis ${attack.address || 'adresse inconnue'}`;
+            } else {
+                msg = `Nouvelle attaque détectée de type ${attack.type} depuis ${attack.address || 'adresse inconnue'}`;
+            }
+            if (lastSpokenAttack !== msg) {
+                speakMessage(msg);
+                lastSpokenAttack = msg;
+            }
+        }
+
+        // Fonction pour épeler une IP chiffre par chiffre avec 'point'
+        function spellIp(ip) {
+            if (!ip) return '';
+            return ip.split('').map(c => c === '.' ? 'point' : c).join(' ');
+        }
+    </script>
+</body>
+</html> 

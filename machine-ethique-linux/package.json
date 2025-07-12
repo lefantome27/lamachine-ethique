@@ -1,0 +1,14 @@
+{
+  "name": "la-machine-ethique-malware-detection",
+  "version": "1.0.0",
+  "description": "La Machine Éthique - Détection de Malware",
+  "main": "main-malware-detection.js",
+  "author": "La Machine Éthique",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^25.0.0"
+  }
+} 

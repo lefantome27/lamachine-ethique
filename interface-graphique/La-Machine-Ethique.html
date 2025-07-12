@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Machine Éthique - Système de Sécurité Avancé</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #00d4ff, #ff6b6b, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #00d4aa, #00a085);
+            border-radius: 25px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .system-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .system-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .system-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .system-icon {
+            font-size: 2.5em;
+            margin-right: 20px;
+        }
+
+        .system-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .system-subtitle {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
+        .system-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .status-active {
+            background: linear-gradient(45deg, #00d4aa, #00a085);
+            color: #000;
+        }
+
+        .status-warning {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+            color: #000;
+        }
+
+        .status-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: #fff;
+        }
+
+        .status-critical {
+            background: linear-gradient(45deg, #ff3838, #ff0000);
+            color: #fff;
+            animation: pulse 1s infinite;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #00d4aa, #00a085);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .malware-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .malware-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .malware-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .malware-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .malware-card.ransomware::before { background: #ff6b6b; }
+        .malware-card.spyware::before { background: #ffa500; }
+        .malware-card.adware::before { background: #ffff00; }
+        .malware-card.trojan::before { background: #ff4757; }
+        .malware-card.worm::before { background: #ff6348; }
+        .malware-card.rootkit::before { background: #ff3838; }
+        .malware-card.keylogger::before { background: #ff9ff3; }
+        .malware-card.bot::before { background: #54a0ff; }
+
+        .malware-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .malware-icon {
+            font-size: 1.8em;
+            margin-right: 15px;
+        }
+
+        .malware-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .malware-subtitle {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .malware-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-test {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-simulate {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-test:hover, .btn-simulate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .log-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .log-entry.info {
+            border-left-color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .log-entry.success {
+            border-left-color: #00d4aa;
+            background: rgba(0, 212, 170, 0.1);
+        }
+
+        .log-entry.warning {
+            border-left-color: #ffa500;
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        .log-entry.danger {
+            border-left-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .log-entry.critical {
+            border-left-color: #ff3838;
+            background: rgba(255, 56, 56, 0.1);
+        }
+
+        .log-time {
+            font-size: 0.8em;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .log-message {
+            font-size: 1em;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(45deg, #00d4aa, #00a085);
+        }
+
+        .notification.warning {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+        }
+
+        .notification.danger {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+        }
+
+        .notification.critical {
+            background: linear-gradient(45deg, #ff3838, #ff0000);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        .scanning::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            animation: scan 2s infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #00d4ff, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
+        .emergency-panel {
+            background: linear-gradient(135deg, rgba(255, 56, 56, 0.2), rgba(255, 0, 0, 0.1));
+            border: 2px solid #ff3838;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .emergency-panel h2 {
+            color: #ff3838;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .emergency-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-emergency {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #ff3838, #ff0000);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-emergency:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 56, 56, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="accessibility-panel" role="region" aria-label="Contrôles d'accessibilité">
+        <h3>♿ Accessibilité</h3>
+        <div class="accessibility-controls">
+            <label for="modeVocal">
+                <input type="checkbox" id="modeVocal" onchange="toggleVocal()" />
+                Mode vocal (synthèse vocale)
+            </label>
+            <label for="highContrast">
+                <input type="checkbox" id="highContrast" onchange="toggleHighContrast()" />
+                Contraste élevé
+            </label>
+            <label for="largeText">
+                <input type="checkbox" id="largeText" onchange="toggleLargeText()" />
+                Texte agrandi
+            </label>
+            <button onclick="readCurrentStatus()" aria-label="Lire le statut actuel du système">
+                🔊 Lire statut
+            </button>
+            <button onclick="toggleKeyboardMode()" aria-label="Activer le mode navigation clavier">
+                ⌨️ Mode clavier
+            </button>
+        </div>
+    </div>
+    <div class="container">
+        <!-- En-tête principal -->
+        <div class="header">
+            <h1>🤖 La Machine Éthique</h1>
+            <p>Système de Sécurité Avancé avec IA Éthique</p>
+            <div class="status-indicator">SYSTÈME OPÉRATIONNEL</div>
+        </div>
+
+        <!-- Statistiques globales -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" id="activeThreats">0</div>
+                <div class="stat-label">Menaces Actives</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="systemsOnline">8</div>
+                <div class="stat-label">Systèmes En Ligne</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="protectionLevel">98%</div>
+                <div class="stat-label">Niveau de Protection</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="lastUpdate">--</div>
+                <div class="stat-label">Dernière Mise à Jour</div>
+            </div>
+        </div>
+
+        <!-- Grille principale des systèmes -->
+        <div class="main-grid">
+            <!-- Système de Détection de Malware -->
+            <div class="system-panel">
+                <div class="system-header">
+                    <div class="system-icon">🛡️</div>
+                    <div>
+                        <div class="system-title">Détection de Malware</div>
+                        <div class="system-subtitle">Protection contre tous types de menaces</div>
+                    </div>
+                </div>
+                <p>Système avancé de détection et neutralisation de malware incluant Ransomware, Spyware, Adware, Cheval de Troie, Ver, Rootkit, Enregistreur de frappe et Bot.</p>
+                <div class="system-status status-active" id="malwareStatus">ACTIF</div>
+                <div class="control-buttons">
+                    <button class="btn btn-primary" onclick="startMalwareScan()">
+                        🔍 Scan Complet
+                    </button>
+                    <button class="btn btn-success" onclick="toggleMalwareProtection()">
+                        🛡️ Protection Temps Réel
+                    </button>
+                    <button class="btn btn-warning" onclick="testAllMalwareTypes()">
+                        🧪 Test Complet
+                    </button>
+                </div>
+            </div>
+
+            <!-- Système de Surveillance Avancée -->
+            <div class="system-panel">
+                <div class="system-header">
+                    <div class="system-icon">👁️</div>
+                    <div>
+                        <div class="system-title">Surveillance Avancée</div>
+                        <div class="system-subtitle">Reconnaissance faciale et analyse comportementale</div>
+                    </div>
+                </div>
+                <p>Système de surveillance intelligent avec reconnaissance faciale, analyse biométrique, monitoring des réseaux sociaux et zones de surveillance configurables.</p>
+                <div class="system-status status-active" id="surveillanceStatus">ACTIF</div>
+                <div class="control-buttons">
+                    <button class="btn btn-primary" onclick="startSurveillance()">
+                        👁️ Activer Surveillance
+                    </button>
+                    <button class="btn btn-success" onclick="analyzeBehavior()">
+                        🧠 Analyse Comportementale
+                    </button>
+                    <button class="btn btn-warning" onclick="configureZones()">
+                        🗺️ Configurer Zones
+                    </button>
+                </div>
+            </div>
+
+            <!-- Système de Communication Sécurisée -->
+            <div class="system-panel">
+                <div class="system-header">
+                    <div class="system-icon">📡</div>
+                    <div>
+                        <div class="system-title">Communication Sécurisée</div>
+                        <div class="system-subtitle">Canaux chiffrés et protocoles d'urgence</div>
+                    </div>
+                </div>
+                <p>Réseau de communication sécurisé avec canaux chiffrés, protocoles d'urgence, coordination d'interventions et système de relais automatique.</p>
+                <div class="system-status status-active" id="communicationStatus">ACTIF</div>
+                <div class="control-buttons">
+                    <button class="btn btn-primary" onclick="establishSecureChannel()">
+                        🔐 Canal Sécurisé
+                    </button>
+                    <button class="btn btn-success" onclick="activateEmergencyProtocol()">
+                        🚨 Protocole d'Urgence
+                    </button>
+                    <button class="btn btn-warning" onclick="testCommunication()">
+                        📡 Test Communication
+                    </button>
+                </div>
+            </div>
+
+            <!-- Système IA Éthique -->
+            <div class="system-panel">
+                <div class="system-header">
+                    <div class="system-icon">🤖</div>
+                    <div>
+                        <div class="system-title">IA Éthique</div>
+                        <div class="system-subtitle">Analyse prédictive et validation éthique</div>
+                    </div>
+                </div>
+                <p>Intelligence artificielle éthique avec analyse prédictive, validation comportementale, apprentissage en temps réel et audits éthiques automatiques.</p>
+                <div class="system-status status-active" id="aiStatus">ACTIF</div>
+                <div class="control-buttons">
+                    <button class="btn btn-primary" onclick="startPredictiveAnalysis()">
+                        🔮 Analyse Prédictive
+                    </button>
+                    <button class="btn btn-success" onclick="performEthicalAudit()">
+                        ⚖️ Audit Éthique
+                    </button>
+                    <button class="btn btn-warning" onclick="validateDecisions()">
+                        ✅ Validation Décisions
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grille des types de malware -->
+        <div class="malware-grid">
+            <!-- Ransomware -->
+            <div class="malware-card ransomware" id="ransomwareCard">
+                <div class="malware-header">
+                    <div class="malware-icon">🔒</div>
+                    <div>
+                        <div class="malware-title">Ransomware</div>
+                        <div class="malware-subtitle">Chiffrement de fichiers</div>
+                    </div>
+                </div>
+                <p>Malware qui chiffre les fichiers et demande une rançon.</p>
+                <div class="malware-actions">
+                    <button class="btn-test" onclick="testMalwareDetection('RANSOMWARE')">
+                        🧪 Tester
+                    </button>
+                    <button class="btn-simulate" onclick="simulateMalwareThreat('RANSOMWARE')">
+                        ⚠️ Simuler
+                    </button>
+                </div>
+            </div>
+
+            <!-- Spyware -->
+            <div class="malware-card spyware" id="spywareCard">
+                <div class="malware-header">
+                    <div class="malware-icon">👁️</div>
+                    <div>
+                        <div class="malware-title">Spyware</div>
+                        <div class="malware-subtitle">Surveillance secrète</div>
+                    </div>
+                </div>
+                <p>Logiciel espion qui collecte des informations.</p>
+                <div class="malware-actions">
+                    <button class="btn-test" onclick="testMalwareDetection('SPYWARE')">
+                        🧪 Tester
+                    </button>
+                    <button class="btn-simulate" onclick="simulateMalwareThreat('SPYWARE')">
+                        ⚠️ Simuler
+                    </button>
+                </div>
+            </div>
+
+            <!-- Adware -->
+            <div class="malware-card adware" id="adwareCard">
+                <div class="malware-header">
+                    <div class="malware-icon">📢</div>
+                    <div>
+                        <div class="malware-title">Adware</div>
+                        <div class="malware-subtitle">Publicités intrusives</div>
+                    </div>
+                </div>
+                <p>Logiciel qui affiche des publicités non désirées.</p>
+                <div class="malware-actions">
+                    <button class="btn-test" onclick="testMalwareDetection('ADWARE')">
+                        🧪 Tester
+                    </button>
+                    <button class="btn-simulate" onclick="simulateMalwareThreat('ADWARE')">
+                        ⚠️ Simuler
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cheval de Troie -->
+            <div class="malware-card trojan" id="trojanCard">
+                <div class="malware-header">
+                    <div class="malware-icon">🐎</div>
+                    <div>
+                        <div class="malware-title">Cheval de Troie</div>
+                        <div class="malware-subtitle">Backdoor caché</div>
+                    </div>
+                </div>
+                <p>Malware qui se fait passer pour un logiciel légitime.</p>
+                <div class="malware-actions">
+                    <button class="btn-test" onclick="testMalwareDetection('TROJAN')">
+                        🧪 Tester
+                    </button>
+                    <button class="btn-simulate" onclick="simulateMalwareThreat('TROJAN')">
+                        ⚠️ Simuler
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ver -->
+            <div class="malware-card worm" id="wormCard">
+                <div class="malware-header">
+                    <div class="malware-icon">🪱</div>
+                    <div>
+                        <div class="malware-title">Ver</div>
+                        <div class="malware-subtitle">Auto-propagation</div>
+                    </div>
+                </div>
+                <p>Malware qui se propage automatiquement sur le réseau.</p>
+                <div class="malware-actions">
+                    <button class="btn-test" onclick="testMalwareDetection('WORM')">
+                        🧪 Tester
+                    </button>
+                    <button class="btn-simulate" onclick="simulateMalwareThreat('WORM')">
+                        ⚠️ Simuler
+                    </button>
+                </div>
+            </div>
+
+            <!-- Rootkit -->
+            <div class="malware-card rootkit" id="rootkitCard">
+                <div class="malware-header">
+                    <div class="malware-icon">👻</div>
+                    <div>
+                        <div class="malware-title">Rootkit</div>
+                        <div class="malware-subtitle">Dissimulation avancée</div>
+                    </div>
+                </div>
+                <p>Malware qui se cache profondément dans le système.</p>
+                <div class="malware-actions">
+                    <button class="btn-test" onclick="testMalwareDetection('ROOTKIT')">
+                        🧪 Tester
+                    </button>
+                    <button class="btn-simulate" onclick="simulateMalwareThreat('ROOTKIT')">
+                        ⚠️ Simuler
+                    </button>
+                </div>
+            </div>
+
+            <!-- Enregistreur de frappe -->
+            <div class="malware-card keylogger" id="keyloggerCard">
+                <div class="malware-header">
+                    <div class="malware-icon">⌨️</div>
+                    <div>
+                        <div class="malware-title">Enregistreur de frappe</div>
+                        <div class="malware-subtitle">Capture de frappes</div>
+                    </div>
+                </div>
+                <p>Malware qui enregistre toutes les frappes clavier.</p>
+                <div class="malware-actions">
+                    <button class="btn-test" onclick="testMalwareDetection('KEYLOGGER')">
+                        🧪 Tester
+                    </button>
+                    <button class="btn-simulate" onclick="simulateMalwareThreat('KEYLOGGER')">
+                        ⚠️ Simuler
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bot -->
+            <div class="malware-card bot" id="botCard">
+                <div class="malware-header">
+                    <div class="malware-icon">🤖</div>
+                    <div>
+                        <div class="malware-title">Bot</div>
+                        <div class="malware-subtitle">Machine zombie</div>
+                    </div>
+                </div>
+                <p>Malware qui transforme l'ordinateur en machine contrôlée.</p>
+                <div class="malware-actions">
+                    <button class="btn-test" onclick="testMalwareDetection('BOT')">
+                        🧪 Tester
+                    </button>
+                    <button class="btn-simulate" onclick="simulateMalwareThreat('BOT')">
+                        ⚠️ Simuler
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panneau d'urgence -->
+        <div class="emergency-panel">
+            <h2>🚨 CONTROLES D'URGENCE</h2>
+            <div class="emergency-buttons">
+                <button class="btn-emergency" onclick="activateEmergencyQuarantine()">
+                    🚨 QUARANTAINE D'URGENCE
+                </button>
+                <button class="btn-emergency" onclick="activateEmergencyProtocol()">
+                    🚨 PROTOCOLE D'URGENCE
+                </button>
+                <button class="btn-emergency" onclick="emergencyShutdown()">
+                    🚨 ARRÊT D'URGENCE
+                </button>
+            </div>
+        </div>
+
+        <!-- Journal des événements -->
+        <div class="log-panel">
+            <h2>📋 Journal des Événements - La Machine Éthique</h2>
+            <div id="eventLog">
+                <div class="log-entry info">
+                    <div class="log-time">[Système] - Initialisation terminée</div>
+                    <div class="log-message">La Machine Éthique est maintenant opérationnelle</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notificationContainer"></div>
+
+    <script>
+        // Variables globales
+        let isSystemActive = true;
+        let activeThreats = 0;
+        let malwareProtection = false;
+        let surveillanceActive = false;
+        let communicationActive = false;
+        let aiActive = false;
+
+        // Types de malware
+        const malwareTypes = [
+            'RANSOMWARE', 'SPYWARE', 'ADWARE', 'TROJAN', 
+            'WORM', 'ROOTKIT', 'KEYLOGGER', 'BOT'
+        ];
+
+        // Variables d'accessibilité
+        let vocalActif = false;
+        let highContrastActif = false;
+        let largeTextActif = false;
+        let keyboardModeActif = false;
+        let lastSpokenThreats = null;
+        let lastSpokenNetworkAlert = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            updateSystemStatus();
+            addLogEntry('success', '🤖 La Machine Éthique initialisée avec succès');
+            addLogEntry('info', '🛡️ Système de détection de malware opérationnel');
+            addLogEntry('info', '👁️ Système de surveillance avancée actif');
+            addLogEntry('info', '📡 Système de communication sécurisée en ligne');
+            addLogEntry('info', '🤖 IA éthique prête pour analyse');
+            
+            // Démarrer les systèmes en arrière-plan
+            startBackgroundSystems();
+
+            // Accueil vocal et guidage
+            if (vocalActif) {
+                setTimeout(() => {
+                    speakMessage(
+                        "Bienvenue sur La Machine Éthique. Utilisez Tab pour naviguer entre les sections. Appuyez sur Entrée pour activer une fonction. Appuyez sur H pour entendre l'aide à tout moment. Appuyez sur 1 pour aller à la détection de malware, 2 pour la surveillance, 3 pour la communication, 4 pour l'IA éthique, 5 pour l'urgence."
+                    );
+                }, 1500);
+            }
+            // Ajout de l'écouteur de focus à tous les boutons et liens
+            document.querySelectorAll('button, a, [tabindex]').forEach(el => {
+                el.addEventListener('focus', announceButtonFocus);
+            });
+        });
+
+        // ===== FONCTIONS SYSTÈME =====
+
+        function updateSystemStatus() {
+            document.getElementById('activeThreats').textContent = activeThreats;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+
+        function startBackgroundSystems() {
+            // Surveillance continue
+            setInterval(() => {
+                if (isSystemActive) {
+                    performContinuousMonitoring();
+                }
+            }, 30000);
+
+            // Mise à jour du statut
+            setInterval(() => {
+                updateSystemStatus();
+            }, 5000);
+        }
+
+        function performContinuousMonitoring() {
+            // Simulation de surveillance continue
+            if (Math.random() > 0.95) {
+                addLogEntry('info', '🔍 Surveillance continue en cours...');
+            }
+        }
+
+        // ===== FONCTIONS MALWARE =====
+
+        function startMalwareScan() {
+            addLogEntry('info', '🔍 Démarrage du scan complet de malware...');
+            showNotification('info', 'Scan de malware en cours');
+            
+            setTimeout(() => {
+                addLogEntry('success', '✅ Scan de malware terminé - Aucune menace détectée');
+                showNotification('success', 'Scan terminé avec succès');
+            }, 3000);
+        }
+
+        function toggleMalwareProtection() {
+            malwareProtection = !malwareProtection;
+            
+            if (malwareProtection) {
+                addLogEntry('success', '🛡️ Protection malware en temps réel activée');
+                showNotification('success', 'Protection malware activée');
+                document.querySelector('[onclick="toggleMalwareProtection()"]').textContent = '🛡️ Désactiver Protection';
+            } else {
+                addLogEntry('warning', '⚠️ Protection malware en temps réel désactivée');
+                showNotification('warning', 'Protection malware désactivée');
+                document.querySelector('[onclick="toggleMalwareProtection()"]').textContent = '🛡️ Protection Temps Réel';
+            }
+        }
+
+        function testAllMalwareTypes() {
+            addLogEntry('info', '🧪 Test complet de tous les types de malware...');
+            showNotification('info', 'Test complet en cours');
+            
+            const types = ['RANSOMWARE', 'SPYWARE', 'ADWARE', 'TROJAN', 'WORM', 'ROOTKIT', 'KEYLOGGER', 'BOT'];
+            
+            types.forEach((type, index) => {
+                setTimeout(() => {
+                    testMalwareDetection(type);
+                }, index * 1000);
+            });
+        }
+
+        function testMalwareDetection(malwareType) {
+            addLogEntry('info', `🧪 Test de détection pour ${malwareType}...`);
+            
+            setTimeout(() => {
+                const detectionSuccess = Math.random() > 0.2;
+                
+                if (detectionSuccess) {
+                    addLogEntry('success', `✅ Détection ${malwareType} : OPÉRATIONNEL`);
+                    showNotification('success', `Détection ${malwareType} fonctionnelle`);
+                } else {
+                    addLogEntry('warning', `⚠️ Détection ${malwareType} : PROBLÈME DÉTECTÉ`);
+                    showNotification('warning', `Problème de détection ${malwareType}`);
+                }
+            }, 2000);
+        }
+
+        function simulateMalwareThreat(malwareType) {
+            addLogEntry('warning', `⚠️ Simulation de menace ${malwareType}...`);
+            showNotification('warning', `Simulation menace ${malwareType}`);
+            
+            setTimeout(() => {
+                const threatLevel = Math.random();
+                let severity, message;
+                
+                if (threatLevel > 0.7) {
+                    severity = 'critical';
+                    message = `🚨 MENACE CRITIQUE ${malwareType} DÉTECTÉE !`;
+                } else if (threatLevel > 0.4) {
+                    severity = 'danger';
+                    message = `🚨 MENACE ${malwareType} DÉTECTÉE !`;
+                } else {
+                    severity = 'warning';
+                    message = `⚠️ Activité suspecte ${malwareType} détectée`;
+                }
+                
+                addLogEntry(severity, message);
+                activeThreats++;
+                updateSystemStatus();
+                
+                // Neutralisation automatique
+                setTimeout(() => {
+                    addLogEntry('success', `✅ Menace ${malwareType} neutralisée automatiquement`);
+                    activeThreats = Math.max(0, activeThreats - 1);
+                    updateSystemStatus();
+                }, 5000);
+            }, 1500);
+        }
+
+        // ===== FONCTIONS SURVEILLANCE =====
+
+        function startSurveillance() {
+            surveillanceActive = !surveillanceActive;
+            
+            if (surveillanceActive) {
+                addLogEntry('success', '👁️ Système de surveillance avancée activé');
+                showNotification('success', 'Surveillance activée');
+            } else {
+                addLogEntry('warning', '⚠️ Système de surveillance désactivé');
+                showNotification('warning', 'Surveillance désactivée');
+            }
+        }
+
+        function analyzeBehavior() {
+            addLogEntry('info', '🧠 Analyse comportementale en cours...');
+            showNotification('info', 'Analyse comportementale');
+            
+            setTimeout(() => {
+                addLogEntry('success', '✅ Analyse comportementale terminée - Aucune anomalie détectée');
+                showNotification('success', 'Analyse terminée');
+            }, 3000);
+        }
+
+        function configureZones() {
+            addLogEntry('info', '🗺️ Configuration des zones de surveillance...');
+            showNotification('info', 'Configuration zones');
+        }
+
+        // ===== FONCTIONS COMMUNICATION =====
+
+        function establishSecureChannel() {
+            addLogEntry('info', '🔐 Établissement d\'un canal sécurisé...');
+            showNotification('info', 'Canal sécurisé');
+            
+            setTimeout(() => {
+                addLogEntry('success', '✅ Canal sécurisé établi - Communication chiffrée active');
+                showNotification('success', 'Canal sécurisé établi');
+            }, 2000);
+        }
+
+        function activateEmergencyProtocol() {
+            addLogEntry('critical', '🚨 PROTOCOLE D\'URGENCE ACTIVÉ');
+            showNotification('critical', 'Protocole d\'urgence activé');
+        }
+
+        function testCommunication() {
+            addLogEntry('info', '📡 Test de communication en cours...');
+            showNotification('info', 'Test communication');
+            
+            setTimeout(() => {
+                addLogEntry('success', '✅ Test de communication réussi - Tous les canaux opérationnels');
+                showNotification('success', 'Test communication réussi');
+            }, 2500);
+        }
+
+        // ===== FONCTIONS IA =====
+
+        function startPredictiveAnalysis() {
+            addLogEntry('info', '🔮 Démarrage de l\'analyse prédictive...');
+            showNotification('info', 'Analyse prédictive');
+            
+            setTimeout(() => {
+                addLogEntry('success', '✅ Analyse prédictive terminée - Prédictions générées');
+                showNotification('success', 'Analyse prédictive terminée');
+            }, 4000);
+        }
+
+        function performEthicalAudit() {
+            addLogEntry('info', '⚖️ Audit éthique en cours...');
+            showNotification('info', 'Audit éthique');
+            
+            setTimeout(() => {
+                addLogEntry('success', '✅ Audit éthique terminé - Conformité 100%');
+                showNotification('success', 'Audit éthique terminé');
+            }, 3500);
+        }
+
+        function validateDecisions() {
+            addLogEntry('info', '✅ Validation des décisions éthiques...');
+            showNotification('info', 'Validation décisions');
+            
+            setTimeout(() => {
+                addLogEntry('success', '✅ Toutes les décisions validées éthiquement');
+                showNotification('success', 'Décisions validées');
+            }, 2000);
+        }
+
+        // ===== FONCTIONS D'URGENCE =====
+
+        function activateEmergencyQuarantine() {
+            addLogEntry('critical', '🚨 QUARANTAINE D\'URGENCE ACTIVÉE');
+            showNotification('critical', 'Quarantaine d\'urgence activée');
+            
+            setTimeout(() => {
+                addLogEntry('success', '✅ Quarantaine d\'urgence terminée - Système sécurisé');
+                activeThreats = 0;
+                updateSystemStatus();
+            }, 5000);
+        }
+
+        function emergencyShutdown() {
+            addLogEntry('critical', '🚨 ARRÊT D\'URGENCE DU SYSTÈME');
+            showNotification('critical', 'Arrêt d\'urgence');
+            
+            setTimeout(() => {
+                addLogEntry('info', '🔄 Redémarrage sécurisé en cours...');
+                setTimeout(() => {
+                    addLogEntry('success', '✅ Système redémarré avec succès');
+                    isSystemActive = true;
+                }, 3000);
+            }, 2000);
+        }
+
+        // ===== FONCTIONS UTILITAIRES =====
+
+        function addLogEntry(type, message) {
+            const log = document.getElementById('eventLog');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            
+            const time = new Date().toLocaleTimeString();
+            entry.innerHTML = `
+                <div class="log-time">[${time}] - ${type.toUpperCase()}</div>
+                <div class="log-message">${message}</div>
+            `;
+            
+            log.insertBefore(entry, log.firstChild);
+            
+            // Limiter le nombre d'entrées
+            if (log.children.length > 100) {
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        function showNotification(type, message) {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    container.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Détection automatique de menaces
+        setInterval(() => {
+            if (malwareProtection && Math.random() > 0.98) {
+                const randomType = malwareTypes[Math.floor(Math.random() * malwareTypes.length)];
+                simulateMalwareThreat(randomType);
+            }
+        }, 30000);
+
+        // Fonctions d'accessibilité
+        function toggleVocal() {
+            vocalActif = document.getElementById('modeVocal').checked;
+            if (vocalActif) {
+                speakMessage('Mode vocal activé. Toutes les actions seront annoncées vocalement.');
+            } else {
+                speakMessage('Mode vocal désactivé.');
+            }
+        }
+        function toggleHighContrast() {
+            highContrastActif = document.getElementById('highContrast').checked;
+            if (highContrastActif) {
+                document.body.classList.add('high-contrast');
+                speakMessage('Contraste élevé activé');
+            } else {
+                document.body.classList.remove('high-contrast');
+                speakMessage('Contraste élevé désactivé');
+            }
+        }
+        function toggleLargeText() {
+            largeTextActif = document.getElementById('largeText').checked;
+            if (largeTextActif) {
+                document.body.style.fontSize = '1.2em';
+                speakMessage('Texte agrandi activé');
+            } else {
+                document.body.style.fontSize = '1em';
+                speakMessage('Texte agrandi désactivé');
+            }
+        }
+        function toggleKeyboardMode() {
+            keyboardModeActif = !keyboardModeActif;
+            if (keyboardModeActif) {
+                speakMessage('Mode navigation clavier activé. Utilisez Tab pour naviguer et Entrée pour activer.');
+            } else {
+                speakMessage('Mode navigation clavier désactivé');
+            }
+        }
+        function readCurrentStatus() {
+            const status = `Statut système: ${document.getElementById('activeThreats')?.textContent || 0} menaces actives, ${document.getElementById('systemsOnline')?.textContent || 0} systèmes en ligne, niveau de protection ${document.getElementById('protectionLevel')?.textContent || ''}`;
+            speakMessage(status);
+        }
+        function speakMessage(message) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(message);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+        // Annonce du focus sur chaque bouton/lien
+        function announceButtonFocus(event) {
+            if (vocalActif) {
+                let label = event.target.getAttribute('aria-label') || event.target.innerText || 'Bouton';
+                speakMessage('Bouton : ' + label);
+            }
+        }
+        document.addEventListener('keydown', function(event) {
+            if (vocalActif && event.key.toLowerCase() === 'h') {
+                speakMessage(
+                    "Aide : Utilisez Tab pour naviguer, Entrée pour activer, 1 à 5 pour accéder rapidement aux sections principales."
+                );
+            }
+            // Raccourcis pour navigation rapide
+            if (vocalActif) {
+                switch(event.key) {
+                    case '1':
+                        document.getElementById('malware-section')?.focus();
+                        speakMessage('Section Détection de malware');
+                        break;
+                    case '2':
+                        document.getElementById('surveillance-section')?.focus();
+                        speakMessage('Section Surveillance');
+                        break;
+                    case '3':
+                        document.getElementById('communication-section')?.focus();
+                        speakMessage('Section Communication');
+                        break;
+                    case '4':
+                        document.getElementById('ai-section')?.focus();
+                        speakMessage('Section IA Éthique');
+                        break;
+                    case '5':
+                        document.getElementById('emergency-section')?.focus();
+                        speakMessage('Section Urgence');
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

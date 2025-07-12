@@ -1,0 +1,116 @@
+GUIDE DE PATCH MANUEL - OCTOSNIFF
+==================================
+
+L'application demande toujours login/mot de passe malgré les patches automatiques.
+Voici comment patcher manuellement avec un éditeur hexadécimal.
+
+OUTILS NÉCESSAIRES:
+- HxD (gratuit) : https://mh-nexus.de/en/hxd/
+- ou 010 Editor
+- ou Hex Workshop
+
+ÉTAPES DE PATCH MANUEL:
+=======================
+
+1. OUVERTURE DU FICHIER
+   - Ouvrir "modifier/OctoSniff_Install_ULTIME.exe" dans HxD
+   - Aller à Recherche > Rechercher (Ctrl+F)
+
+2. RECHERCHE DES CHAÎNES D'AUTHENTIFICATION
+   Rechercher ces chaînes une par une (en mode texte) :
+   
+   a) "login" - Notez l'adresse où elle apparaît
+   b) "password" - Notez l'adresse où elle apparaît  
+   c) "auth" - Notez l'adresse où elle apparaît
+   d) "user" - Notez l'adresse où elle apparaît
+   e) "email" - Notez l'adresse où elle apparaît
+   f) "licen" - Notez l'adresse où elle apparaît
+
+3. PATCH DES ZONES CRITIQUES
+   Pour chaque chaîne trouvée, patcher les zones autour :
+
+   a) AUTOUR DE "LOGIN" :
+      - Chercher les bytes E8 (CALL) avant/après la chaîne
+      - Remplacer par 90 90 90 90 90 (NOP x5)
+      
+   b) AUTOUR DE "PASSWORD" :
+      - Chercher les bytes 75 ou 74 (JNZ/JZ) avant/après
+      - Remplacer par 90 90 (NOP x2)
+      
+   c) AUTOUR DE "AUTH" :
+      - Chercher les bytes 83 3D (CMP) avant/après
+      - Remplacer par C7 05 00 00 00 00 (MOV [mem], 0)
+
+4. PATCH DES SAUTS CONDITIONNELS
+   Chercher ces patterns et les remplacer :
+   
+   Original -> Patch
+   75 XX    -> 90 90     (JNZ -> NOP NOP)
+   74 XX    -> 90 90     (JZ -> NOP NOP)
+   0F 85 XX XX XX XX -> 90 90 90 90 90 90 (JNZ long -> NOP x6)
+   0F 84 XX XX XX XX -> 90 90 90 90 90 90 (JZ long -> NOP x6)
+
+5. PATCH DES APPELS DE FONCTION
+   Chercher E8 (CALL) et remplacer par 90 90 90 90 90 (NOP x5)
+
+6. PATCH DES COMPARAISONS
+   Chercher 83 3D (CMP [mem], imm8) et remplacer par C7 05 00 00 00 00 (MOV [mem], 0)
+
+7. INJECTION DE CODE DE BYPASS
+   Chercher 55 8B EC (prologue de fonction) et remplacer par B8 01 00 00 00 C3 (MOV EAX, 1; RET)
+
+MÉTHODE ALTERNATIVE - PATCH AGGRESSIF:
+======================================
+
+Si le patch ciblé ne fonctionne pas, appliquer un patch agressif :
+
+1. Remplacer TOUS les CALL (E8) par NOP
+2. Remplacer TOUS les sauts conditionnels (75, 74, 0F 85, 0F 84) par NOP
+3. Remplacer TOUTES les comparaisons (83 3D) par MOV
+4. Injecter des retours de succès dans les zones critiques
+
+INSTRUCTIONS DÉTAILLÉES POUR HXD:
+=================================
+
+1. Ouvrir HxD
+2. Fichier > Ouvrir > modifier/OctoSniff_Install_ULTIME.exe
+3. Ctrl+F pour rechercher
+4. Mode "Texte" pour chercher les chaînes
+5. Mode "Hex" pour chercher les bytes
+6. Remplacer les bytes trouvés
+7. Fichier > Enregistrer sous > OctoSniff_Install_PATCHED.exe
+
+VÉRIFICATION POST-PATCH:
+=======================
+
+1. Sauvegarder le fichier patché
+2. Lancer l'application
+3. Vérifier qu'aucune demande d'authentification n'apparaît
+4. Tester les fonctionnalités principales
+
+EN CAS D'ÉCHEC:
+===============
+
+Si le patch manuel ne fonctionne pas :
+1. L'application utilise des protections avancées
+2. Il faut utiliser un débogueur (x64dbg, IDA Pro)
+3. Analyser le code en temps réel
+4. Identifier précisément les routines d'authentification
+
+NOTES IMPORTANTES:
+==================
+
+⚠️ UTILISATION ÉDUCATIVE UNIQUEMENT
+- Respecter les licences logicielles
+- Utiliser uniquement sur des logiciels dont vous êtes propriétaire
+- Ne pas distribuer les versions modifiées
+
+🔧 TROUBLESHOOTING:
+- Si l'application ne démarre plus : restaurer la sauvegarde
+- Si les patches ne fonctionnent pas : vérifier les adresses
+- Si l'authentification persiste : protections avancées détectées
+
+📝 DOCUMENTATION:
+- Noter toutes les modifications apportées
+- Garder une trace des adresses patchées
+- Documenter les résultats des tests 

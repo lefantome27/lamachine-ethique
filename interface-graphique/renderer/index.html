@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Machine - Système de Sécurité Éthique</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Header Principal -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-shield-alt logo-icon"></i>
+                    <h1 class="app-title">La Machine</h1>
+                    <span class="app-subtitle">Système de Sécurité Éthique</span>
+                </div>
+                <div class="system-status">
+                    <div class="status-indicator" id="systemStatus">
+                        <i class="fas fa-circle status-icon"></i>
+                        <span class="status-text">Initialisation...</span>
+                    </div>
+                    <div class="last-update" id="lastUpdate">
+                        Dernière mise à jour: --
+                    </div>
+                </div>
+                <div class="user-controls">
+                    <button class="btn btn-secondary" id="settingsBtn">
+                        <i class="fas fa-cog"></i>
+                        Configuration
+                    </button>
+                    <button class="btn btn-primary" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i>
+                        Actualiser
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Principale -->
+        <nav class="main-nav">
+            <div class="nav-container">
+                <button class="nav-tab active" data-tab="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Tableau de Bord
+                </button>
+                <button class="nav-tab" data-tab="finch">
+                    <i class="fas fa-user-tie"></i>
+                    Interface Finch
+                </button>
+                <button class="nav-tab" data-tab="reese">
+                    <i class="fas fa-user-secret"></i>
+                    Interface Reese
+                </button>
+                <button class="nav-tab" data-tab="machine">
+                    <i class="fas fa-brain"></i>
+                    The Machine
+                </button>
+                <button class="nav-tab" data-tab="numbers">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Numbers Alert
+                </button>
+                <button class="nav-tab" data-tab="logs">
+                    <i class="fas fa-list-alt"></i>
+                    Logs & Événements
+                </button>
+            </div>
+        </nav>
+
+        <!-- Contenu Principal -->
+        <main class="main-content">
+            <!-- Tableau de Bord Principal -->
+            <div id="dashboard" class="tab-content active">
+                <div class="dashboard-grid">
+                    <!-- Statut des Composants -->
+                    <div class="dashboard-card component-status">
+                        <h3><i class="fas fa-server"></i> Statut des Composants</h3>
+                        <div class="component-grid">
+                            <div class="component-item" id="finchStatus">
+                                <div class="component-icon">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <div class="component-info">
+                                    <h4>Finch</h4>
+                                    <span class="status">--</span>
+                                </div>
+                            </div>
+                            <div class="component-item" id="reeseStatus">
+                                <div class="component-icon">
+                                    <i class="fas fa-user-secret"></i>
+                                </div>
+                                <div class="component-info">
+                                    <h4>Reese</h4>
+                                    <span class="status">--</span>
+                                </div>
+                            </div>
+                            <div class="component-item" id="machineStatus">
+                                <div class="component-icon">
+                                    <i class="fas fa-brain"></i>
+                                </div>
+                                <div class="component-info">
+                                    <h4>The Machine</h4>
+                                    <span class="status">--</span>
+                                </div>
+                            </div>
+                            <div class="component-item" id="numbersStatus">
+                                <div class="component-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="component-info">
+                                    <h4>Numbers</h4>
+                                    <span class="status">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertes Actives -->
+                    <div class="dashboard-card alerts-panel">
+                        <h3><i class="fas fa-bell"></i> Alertes Actives</h3>
+                        <div class="alerts-list" id="activeAlerts">
+                            <div class="no-alerts">
+                                <i class="fas fa-check-circle"></i>
+                                <p>Aucune alerte active</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menaces Détectées -->
+                    <div class="dashboard-card threats-panel">
+                        <h3><i class="fas fa-shield-alt"></i> Menaces Détectées</h3>
+                        <div class="threats-list" id="activeThreats">
+                            <div class="no-threats">
+                                <i class="fas fa-shield-check"></i>
+                                <p>Aucune menace détectée</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Métriques de Performance -->
+                    <div class="dashboard-card performance-panel">
+                        <h3><i class="fas fa-chart-line"></i> Métriques de Performance</h3>
+                        <div class="metrics-grid">
+                            <div class="metric-item">
+                                <span class="metric-label">Précision IA</span>
+                                <span class="metric-value" id="aiAccuracy">--</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Vitesse Traitement</span>
+                                <span class="metric-value" id="processingSpeed">--</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Conformité Éthique</span>
+                                <span class="metric-value" id="ethicalCompliance">--</span>
+                            </div>
+                            <div class="metric-item">
+                                <span class="metric-label">Temps de Réponse</span>
+                                <span class="metric-value" id="responseTime">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Connexions Actives -->
+                    <div class="dashboard-card connections-panel">
+                        <h3><i class="fas fa-network-wired"></i> Connexions Actives</h3>
+                        <div class="connections-list" id="activeConnections">
+                            <div class="no-connections">
+                                <i class="fas fa-plug"></i>
+                                <p>Aucune connexion active</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Événements Récents -->
+                    <div class="dashboard-card events-panel">
+                        <h3><i class="fas fa-history"></i> Événements Récents</h3>
+                        <div class="events-list" id="recentEvents">
+                            <div class="no-events">
+                                <i class="fas fa-clock"></i>
+                                <p>Aucun événement récent</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interface Finch -->
+            <div id="finch" class="tab-content">
+                <div class="finch-interface">
+                    <div class="interface-header">
+                        <h2><i class="fas fa-user-tie"></i> Interface Finch - Configuration et Maintenance Éthique</h2>
+                        <p>Gestion des règles éthiques et maintenance du système</p>
+                    </div>
+                    
+                    <div class="finch-content">
+                        <div class="ethical-rules-section">
+                            <h3>Règles Éthiques</h3>
+                            <div class="rules-list" id="ethicalRules">
+                                <!-- Les règles éthiques seront chargées ici -->
+                            </div>
+                            <button class="btn btn-primary" id="addEthicalRule">
+                                <i class="fas fa-plus"></i>
+                                Ajouter une Règle
+                            </button>
+                        </div>
+
+                        <div class="maintenance-section">
+                            <h3>Maintenance du Système</h3>
+                            <div class="maintenance-actions">
+                                <button class="btn btn-secondary" data-maintenance="health_check">
+                                    <i class="fas fa-heartbeat"></i>
+                                    Vérification Santé
+                                </button>
+                                <button class="btn btn-secondary" data-maintenance="data_cleanup">
+                                    <i class="fas fa-broom"></i>
+                                    Nettoyage Données
+                                </button>
+                                <button class="btn btn-secondary" data-maintenance="ethical_audit">
+                                    <i class="fas fa-balance-scale"></i>
+                                    Audit Éthique
+                                </button>
+                                <button class="btn btn-secondary" data-maintenance="performance_optimization">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    Optimisation Performance
+                                </button>
+                                <button class="btn btn-secondary" data-maintenance="security_update">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Mise à Jour Sécurité
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="system-health-section">
+                            <h3>Santé du Système</h3>
+                            <div class="health-metrics" id="systemHealth">
+                                <!-- Les métriques de santé seront chargées ici -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interface Reese -->
+            <div id="reese" class="tab-content">
+                <div class="reese-interface">
+                    <div class="interface-header">
+                        <h2><i class="fas fa-user-secret"></i> Interface Reese - Surveillance et Intervention</h2>
+                        <p>Surveillance en temps réel et interventions opérationnelles</p>
+                    </div>
+                    
+                    <div class="reese-content">
+                        <div class="surveillance-section">
+                            <h3>Surveillance en Temps Réel</h3>
+                            <div class="surveillance-feeds" id="surveillanceFeeds">
+                                <!-- Les flux de surveillance seront chargés ici -->
+                            </div>
+                        </div>
+
+                        <div class="threats-section">
+                            <h3>Menaces Actives</h3>
+                            <div class="threats-management" id="threatsManagement">
+                                <!-- La gestion des menaces sera ici -->
+                            </div>
+                        </div>
+
+                        <div class="interventions-section">
+                            <h3>Interventions en Cours</h3>
+                            <div class="interventions-queue" id="interventionsQueue">
+                                <!-- La queue d'interventions sera ici -->
+                            </div>
+                        </div>
+
+                        <div class="performance-section">
+                            <h3>Métriques de Performance</h3>
+                            <div class="performance-metrics" id="reesePerformance">
+                                <!-- Les métriques de performance seront ici -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The Machine -->
+            <div id="machine" class="tab-content">
+                <div class="machine-interface">
+                    <div class="interface-header">
+                        <h2><i class="fas fa-brain"></i> The Machine - Traitement et Analyse</h2>
+                        <p>Cœur d'intelligence artificielle et traitement des données</p>
+                    </div>
+                    
+                    <div class="machine-content">
+                        <div class="neural-network-section">
+                            <h3>Réseau Neuronal</h3>
+                            <div class="neural-status" id="neuralStatus">
+                                <!-- Le statut du réseau neuronal sera ici -->
+                            </div>
+                        </div>
+
+                        <div class="predictions-section">
+                            <h3>Prédictions Actives</h3>
+                            <div class="predictions-list" id="activePredictions">
+                                <!-- Les prédictions actives seront ici -->
+                            </div>
+                        </div>
+
+                        <div class="learning-section">
+                            <h3>Module d'Apprentissage</h3>
+                            <div class="learning-progress" id="learningProgress">
+                                <!-- Le progrès d'apprentissage sera ici -->
+                            </div>
+                        </div>
+
+                        <div class="memory-section">
+                            <h3>Banque de Mémoire</h3>
+                            <div class="memory-status" id="memoryStatus">
+                                <!-- Le statut de la mémoire sera ici -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Numbers Alert -->
+            <div id="numbers" class="tab-content">
+                <div class="numbers-interface">
+                    <div class="interface-header">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Numbers Alert - Notifications de Menaces</h2>
+                        <p>Système d'alertes et notifications en temps réel</p>
+                    </div>
+                    
+                    <div class="numbers-content">
+                        <div class="alerts-section">
+                            <h3>Alertes Actives</h3>
+                            <div class="alerts-management" id="alertsManagement">
+                                <!-- La gestion des alertes sera ici -->
+                            </div>
+                        </div>
+
+                        <div class="notifications-section">
+                            <h3>Canal de Notifications</h3>
+                            <div class="notification-channels" id="notificationChannels">
+                                <!-- Les canaux de notification seront ici -->
+                            </div>
+                        </div>
+
+                        <div class="statistics-section">
+                            <h3>Statistiques d'Alertes</h3>
+                            <div class="alert-statistics" id="alertStatistics">
+                                <!-- Les statistiques d'alertes seront ici -->
+                            </div>
+                        </div>
+
+                        <div class="history-section">
+                            <h3>Historique des Alertes</h3>
+                            <div class="alert-history" id="alertHistory">
+                                <!-- L'historique des alertes sera ici -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs et Événements -->
+            <div id="logs" class="tab-content">
+                <div class="logs-interface">
+                    <div class="interface-header">
+                        <h2><i class="fas fa-list-alt"></i> Logs et Événements</h2>
+                        <p>Historique complet des événements système</p>
+                    </div>
+                    
+                    <div class="logs-content">
+                        <div class="logs-controls">
+                            <div class="filter-controls">
+                                <select id="logFilter" class="form-control">
+                                    <option value="all">Tous les événements</option>
+                                    <option value="INFO">Informations</option>
+                                    <option value="WARNING">Avertissements</option>
+                                    <option value="ERROR">Erreurs</option>
+                                    <option value="CRITICAL">Critiques</option>
+                                </select>
+                                <input type="text" id="logSearch" class="form-control" placeholder="Rechercher...">
+                            </div>
+                            <div class="export-controls">
+                                <button class="btn btn-secondary" id="exportLogs">
+                                    <i class="fas fa-download"></i>
+                                    Exporter
+                                </button>
+                                <button class="btn btn-secondary" id="clearLogs">
+                                    <i class="fas fa-trash"></i>
+                                    Effacer
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="logs-display">
+                            <div class="logs-table" id="logsTable">
+                                <!-- Les logs seront affichés ici -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <span>La Machine v1.0.0</span>
+                    <span>•</span>
+                    <span>Système de Sécurité Éthique</span>
+                    <span>•</span>
+                    <span>Inspiré de Person of Interest</span>
+                </div>
+                <div class="footer-status">
+                    <span id="footerStatus">Système opérationnel</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modales -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Titre de la Modale</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content" id="modalContent">
+                <!-- Le contenu de la modale sera ici -->
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <!-- Les boutons de la modale seront ici -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/main.js"></script>
+    <script src="scripts/dashboard.js"></script>
+    <script src="scripts/components.js"></script>
+    <script src="scripts/ui.js"></script>
+</body>
+</html> 

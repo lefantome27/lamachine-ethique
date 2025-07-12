@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Machine Éthique - Système de Sécurité Avancé</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #00d4ff, #ff6b6b, #00d4aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #00d4aa, #00a085);
+            border-radius: 25px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .system-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .system-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .system-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .system-icon {
+            font-size: 2.5em;
+            margin-right: 20px;
+        }
+
+        .system-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .system-subtitle {
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
+        .system-status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+
+        .status-active {
+            background: linear-gradient(45deg, #00d4aa, #00a085);
+            color: #000;
+        }
+
+        .status-warning {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+            color: #000;
+        }
+
+        .status-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: #fff;
+        }
+
+        .status-critical {
+            background: linear-gradient(45deg, #ff3838, #ff0000);
+            color: #fff;
+            animation: pulse 1s infinite;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #00d4aa, #00a085);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #ff6b6b, #ff4757);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .malware-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .malware-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .malware-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .malware-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .malware-card.ransomware::before { background: #ff6b6b; }
+        .malware-card.spyware::before { background: #ffa500; }
+        .malware-card.adware::before { background: #ffff00; }
+        .malware-card.trojan::before { background: #ff4757; }
+        .malware-card.worm::before { background: #ff6348; }
+        .malware-card.rootkit::before { background: #ff3838; }
+        .malware-card.keylogger::before { background: #ff9ff3; }
+        .malware-card.bot::before { background: #54a0ff; }
+
+        .malware-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .malware-icon {
+            font-size: 1.8em;
+            margin-right: 15px;
+        }
+
+        .malware-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .malware-subtitle {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .malware-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+// ... (le reste du fichier suit, 1097 lignes au total)
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>La Machine Éthique</h1>
+            <p>Système de Sécurité Avancé pour Linux</p>
+            <div class="status-indicator">Système en état de sécurité</div>
+        </div>
+
+        <div class="main-grid">
+            <div class="system-panel">
+                <div class="system-header">
+                    <i class="fas fa-shield-alt system-icon"></i>
+                    <div>
+                        <h3 class="system-title">Système de Protection</h3>
+                        <p class="system-subtitle">Contrôle et gestion des menaces</p>
+                    </div>
+                </div>
+                <div class="system-status status-active">État : Actif</div>
+                <div class="control-buttons">
+                    <button class="btn btn-primary">Analyser</button>
+                    <button class="btn btn-success">Mettre à jour</button>
+                    <button class="btn btn-warning">Vérifier</button>
+                </div>
+            </div>
+
+            <div class="system-panel">
+                <div class="system-header">
+                    <i class="fas fa-fire system-icon"></i>
+                    <div>
+                        <h3 class="system-title">Détection de Malware</h3>
+                        <p class="system-subtitle">Analyse en temps réel des fichiers</p>
+                    </div>
+                </div>
+                <div class="system-status status-warning">État : Alertes</div>
+                <div class="control-buttons">
+                    <button class="btn btn-danger">Exécuter</button>
+                    <button class="btn btn-primary">Analyser</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="malware-grid">
+            <div class="malware-card ransomware">
+                <div class="malware-header">
+                    <i class="fas fa-virus malware-icon"></i>
+                    <div>
+                        <h4 class="malware-title">Ransomware</h4>
+                        <p class="malware-subtitle">Menace potentielle</p>
+                    </div>
+                </div>
+                <div class="malware-actions">
+                    <button class="btn btn-danger">Supprimer</button>
+                    <button class="btn btn-warning">Isoler</button>
+                </div>
+            </div>
+            <div class="malware-card spyware">
+                <div class="malware-header">
+                    <i class="fas fa-eye malware-icon"></i>
+                    <div>
+                        <h4 class="malware-title">Spyware</h4>
+                        <p class="malware-subtitle">Menace de surveillance</p>
+                    </div>
+                </div>
+                <div class="malware-actions">
+                    <button class="btn btn-danger">Supprimer</button>
+                    <button class="btn btn-warning">Isoler</button>
+                </div>
+            </div>
+            <div class="malware-card adware">
+                <div class="malware-header">
+                    <i class="fas fa-ad malware-icon"></i>
+                    <div>
+                        <h4 class="malware-title">Adware</h4>
+                        <p class="malware-subtitle">Publicité intrusive</p>
+                    </div>
+                </div>
+                <div class="malware-actions">
+                    <button class="btn btn-danger">Supprimer</button>
+                    <button class="btn btn-warning">Isoler</button>
+                </div>
+            </div>
+            <div class="malware-card trojan">
+                <div class="malware-header">
+                    <i class="fas fa-code malware-icon"></i>
+                    <div>
+                        <h4 class="malware-title">Trojan</h4>
+                        <p class="malware-subtitle">Menace cachée</p>
+                    </div>
+                </div>
+                <div class="malware-actions">
+                    <button class="btn btn-danger">Supprimer</button>
+                    <button class="btn btn-warning">Isoler</button>
+                </div>
+            </div>
+            <div class="malware-card worm">
+                <div class="malware-header">
+                    <i class="fas fa-bug malware-icon"></i>
+                    <div>
+                        <h4 class="malware-title">Worm</h4>
+                        <p class="malware-subtitle">Propagation automatique</p>
+                    </div>
+                </div>
+                <div class="malware-actions">
+                    <button class="btn btn-danger">Supprimer</button>
+                    <button class="btn btn-warning">Isoler</button>
+                </div>
+            </div>
+            <div class="malware-card rootkit">
+                <div class="malware-header">
+                    <i class="fas fa-key malware-icon"></i>
+                    <div>
+                        <h4 class="malware-title">Rootkit</h4>
+                        <p class="malware-subtitle">Accès non autorisé</p>
+                    </div>
+                </div>
+                <div class="malware-actions">
+                    <button class="btn btn-danger">Supprimer</button>
+                    <button class="btn btn-warning">Isoler</button>
+                </div>
+            </div>
+            <div class="malware-card keylogger">
+                <div class="malware-header">
+                    <i class="fas fa-keyboard malware-icon"></i>
+                    <div>
+                        <h4 class="malware-title">Keylogger</h4>
+                        <p class="malware-subtitle">Surveillance des touches</p>
+                    </div>
+                </div>
+                <div class="malware-actions">
+                    <button class="btn btn-danger">Supprimer</button>
+                    <button class="btn btn-warning">Isoler</button>
+                </div>
+            </div>
+            <div class="malware-card bot">
+                <div class="malware-header">
+                    <i class="fas fa-robot malware-icon"></i>
+                    <div>
+                        <h4 class="malware-title">Bot</h4>
+                        <p class="malware-subtitle">Activité non autorisée</p>
+                    </div>
+                </div>
+                <div class="malware-actions">
+                    <button class="btn btn-danger">Supprimer</button>
+                    <button class="btn btn-warning">Isoler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html> 
